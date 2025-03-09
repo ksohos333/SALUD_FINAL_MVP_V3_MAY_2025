@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Choose Your Plan</h1>
+        <p class="lead text-muted">Unlock the full potential of ¡Salud! with our premium features</p>
+    </div>
+    
+    <div class="row justify-content-center">
+        <!-- Free Tier -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-light py-3">
+                    <h4 class="my-0 fw-normal text-center">Free</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title text-center">$0<small class="text-muted fw-light">/month</small></h1>
+                    <ul class="list-unstyled mt-4 mb-5">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Access to thousands of hours of audio with transcripts</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Limited word saving (up to 20 per day)</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Basic lesson generation</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Core community features</li>
+                        <li class="mb-3"><i class="fas fa-times text-danger me-2"></i> Advanced AI-assisted grammar guides</li>
+                        <li class="mb-3"><i class="fas fa-times text-danger me-2"></i> Enhanced vocabulary system</li>
+                        <li class="mb-3"><i class="fas fa-times text-danger me-2"></i> Auto-generated audio</li>
+                        <li class="mb-3"><i class="fas fa-times text-danger me-2"></i> Offline access</li>
+                    </ul>
+                    <div class="d-grid">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary">Sign Up Free</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Premium Tier -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow border-primary">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="my-0 fw-normal text-center">Premium</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title text-center">$9.99<small class="text-muted fw-light">/month</small></h1>
+                    <ul class="list-unstyled mt-4 mb-5">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> <strong>Everything in Free, plus:</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> <strong>Unlimited</strong> saved words</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Auto-generated audio for imported lessons</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Full sentence translations</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Advanced statistics and progress tracking</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Offline access</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> AI-assisted grammar guides</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Enhanced vocabulary system with flashcards</li>
+                    </ul>
+                    <div class="d-grid">
+                        <a href="#" class="btn btn-primary">Upgrade Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Annual Plan -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h4 class="my-0 fw-normal text-center">Annual</h4>
+                    <div class="badge bg-danger position-absolute top-0 end-0 translate-middle-y me-3">Save 20%</div>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title text-center">$95.88<small class="text-muted fw-light">/year</small></h1>
+                    <ul class="list-unstyled mt-4 mb-5">
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> <strong>All Premium features</strong></li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Save 20% compared to monthly plan</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Priority customer support</li>
+                        <li class="mb-3"><i class="fas fa-check text-success me-2"></i> Early access to new features</li>
+                    </ul>
+                    <div class="d-grid">
+                        <a href="#" class="btn btn-warning">Get Annual Plan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title">Frequently Asked Questions</h3>
+                    <div class="accordion mt-4" id="pricingFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Can I cancel my subscription at any time?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    Yes, you can cancel your subscription at any time. If you cancel, you'll still have access to premium features until the end of your current billing period.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Is there a student discount?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    Yes, we offer a 15% discount for students. Please contact our support team with proof of your student status to receive your discount code.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Can I switch between monthly and annual plans?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#pricingFAQ">
+                                <div class="accordion-body">
+                                    Yes, you can switch between plans at any time. If you switch from monthly to annual, we'll apply a prorated discount for the remainder of your subscription.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

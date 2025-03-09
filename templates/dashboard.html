@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 mb-0">Welcome back, {{ current_user.username }}!</h1>
+            <p class="lead text-muted">Track your progress and continue your language learning journey.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="languageSelector" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-language me-1"></i> Spanish
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="languageSelector">
+                    <li><a class="dropdown-item active" href="#">Spanish</a></li>
+                    <li><a class="dropdown-item" href="#">French</a></li>
+                    <li><a class="dropdown-item" href="#">German</a></li>
+                    <li><a class="dropdown-item" href="#">Italian</a></li>
+                    <li><a class="dropdown-item" href="#">Russian</a></li>
+                    <li><a class="dropdown-item" href="#">Chinese</a></li>
+                    <li><a class="dropdown-item" href="#">Japanese</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Streak and Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Current Streak</h5>
+                    <div class="display-1 fw-bold text-primary mb-2">{{ streak|default(7) }}</div>
+                    <p class="card-text">days in a row</p>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="small text-muted mb-0">3 more days to reach your best streak!</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Weekly Activity</h5>
+                    <div class="row text-center">
+                        <div class="col">
+                            <div class="display-6 fw-bold text-success">{{ lessons_completed|default(12) }}</div>
+                            <p class="small text-muted">Lessons</p>
+                        </div>
+                        <div class="col">
+                            <div class="display-6 fw-bold text-info">{{ words_learned|default(48) }}</div>
+                            <p class="small text-muted">Words</p>
+                        </div>
+                        <div class="col">
+                            <div class="display-6 fw-bold text-warning">{{ minutes_practiced|default(95) }}</div>
+                            <p class="small text-muted">Minutes</p>
+                        </div>
+                        <div class="col">
+                            <div class="display-6 fw-bold text-danger">{{ xp_earned|default(350) }}</div>
+                            <p class="small text-muted">XP</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <canvas id="activityChart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Learning & Recommendations -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Continue Learning</h2>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="card-title mb-0">Ordering Food at Restaurants</h5>
+                            <p class="card-text text-muted">Intermediate • 75% Complete</p>
+                        </div>
+                        <a href="/lessons/continue" class="btn btn-primary">Continue</a>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="h4 mb-3">Recommended for You</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Travel Vocabulary</h5>
+                            <p class="card-text">Learn essential words and phrases for your next trip.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success">Beginner</span>
+                                <a href="/lessons/travel" class="btn btn-sm btn-outline-primary">Start</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Past Tense Practice</h5>
+                            <p class="card-text">Master the past tense with interactive exercises.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-warning text-dark">Intermediate</span>
+                                <a href="/lessons/past-tense" class="btn btn-sm btn-outline-primary">Start</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Daily Goals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Complete 1 lesson</span>
+                            <span>1/1</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Learn 10 new words</span>
+                            <span>8/10</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Practice for 15 minutes</span>
+                            <span>12/15</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Complete 1 writing exercise</span>
+                            <span>0/1</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary">Set Custom Goals</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Achievements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">7-Day Streak</h6>
+                            <p class="card-text text-muted small mb-0">Keep practicing daily!</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Vocabulary Builder</h6>
+                            <p class="card-text text-muted small mb-0">Learned 50+ words</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Writing Novice</h6>
+                            <p class="card-text text-muted small mb-0">Complete 5 writing exercises to unlock</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <a href="/achievements" class="btn btn-sm btn-outline-success">View All Achievements</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recently Learned Words -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Recently Learned Words</h2>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">el restaurante</h5>
+                                    <p class="card-text text-muted">restaurant</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-success">Noun</span>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">pedir</h5>
+                                    <p class="card-text text-muted">to order</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-primary">Verb</span>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">la cuenta</h5>
+                                    <p class="card-text text-muted">the bill</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-success">Noun</span>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">delicioso</h5>
+                                    <p class="card-text text-muted">delicious</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-info">Adjective</span>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-volume-up"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/vocabulary" class="btn btn-outline-primary">View All Vocabulary</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activity Chart
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Minutes Studied',
+                    data: [15, 20, 10, 25, 15, 5, 30],
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,319 @@
+/* ¡Salud! Language Learning Platform - Custom Styles */
+
+:root {
+    /* Light Theme Colors (Default) */
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    
+    /* Theme Specific Variables */
+    --body-bg: #ffffff;
+    --body-color: #333333;
+    --card-bg: #ffffff;
+    --card-border: rgba(0, 0, 0, 0.125);
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --input-color: #212529;
+    --navbar-bg: #0d6efd;
+    --navbar-color: #ffffff;
+    --footer-bg: #212529;
+    --footer-color: #ffffff;
+    --typing-area-bg: #f9f9f9;
+    --typing-area-border: #dddddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Colors */
+[data-theme="dark"] {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #343a40;
+    --dark-color: #f8f9fa;
+    
+    /* Theme Specific Variables */
+    --body-bg: #121212;
+    --body-color: #e0e0e0;
+    --card-bg: #1e1e1e;
+    --card-border: rgba(255, 255, 255, 0.125);
+    --input-bg: #2d2d2d;
+    --input-border: #444444;
+    --input-color: #e0e0e0;
+    --navbar-bg: #1a1a1a;
+    --navbar-color: #ffffff;
+    --footer-bg: #1a1a1a;
+    --footer-color: #ffffff;
+    --typing-area-bg: #2d2d2d;
+    --typing-area-border: #444444;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--body-color);
+    background-color: var(--body-bg);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--body-color);
+}
+
+/* Navbar Customization */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--navbar-color);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--navbar-color) !important;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Feature Icons */
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+}
+
+/* Card Styles */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+    color: var(--body-color);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--shadow-color) !important;
+}
+
+.card-header, .card-footer {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-color: var(--card-border);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-color);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--input-bg);
+    color: var(--input-color);
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    padding: 6rem 0;
+    margin-top: -1.5rem;
+}
+
+/* Footer Customization */
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-color);
+}
+
+footer a {
+    text-decoration: none;
+    color: var(--footer-color);
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--info-color) !important;
+    text-decoration: underline;
+}
+
+/* Lesson Card Styles */
+.lesson-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Journal Entry Styles */
+.journal-entry {
+    border-left: 4px solid var(--success-color);
+}
+
+/* Writing Exercise Styles */
+.writing-exercise {
+    border-left: 4px solid var(--info-color);
+}
+
+/* Immersion Content Styles */
+.immersion-content {
+    border-left: 4px solid var(--warning-color);
+}
+
+/* Language Selection */
+.language-selector .dropdown-item.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Progress Bar Customization */
+.progress {
+    height: 10px;
+    border-radius: 5px;
+}
+
+/* Statistics Panel */
+.stats-card {
+    background-color: var(--light-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stats-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.stats-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Challenge Cards */
+.challenge-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.challenge-card .card-header {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+/* Typing Exercise Styles */
+.typing-area {
+    font-family: monospace;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    padding: 1rem;
+    border: 1px solid var(--typing-area-border);
+    border-radius: 5px;
+    background-color: var(--typing-area-bg);
+    color: var(--body-color);
+    min-height: 150px;
+}
+
+/* Dark Mode Specific Adjustments */
+[data-theme="dark"] .bg-light {
+    background-color: var(--light-color) !important;
+}
+
+[data-theme="dark"] .bg-dark {
+    background-color: var(--dark-color) !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: var(--body-color) !important;
+}
+
+[data-theme="dark"] .border {
+    border-color: var(--card-border) !important;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--navbar-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 4rem 0;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .stats-card .stat-value {
+        font-size: 1.5rem;
+    }
+}

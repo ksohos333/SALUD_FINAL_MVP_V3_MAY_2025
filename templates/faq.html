@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 mb-4">Frequently Asked Questions</h1>
+            <p class="lead mb-5">Find answers to common questions about ¡Salud! Language Learning Platform.</p>
+            
+            <div class="accordion shadow" id="faqAccordion">
+                <!-- General Questions -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingGeneral">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral" aria-expanded="true" aria-controls="collapseGeneral">
+                            <i class="fas fa-info-circle me-2"></i> General Questions
+                        </button>
+                    </h2>
+                    <div id="collapseGeneral" class="accordion-collapse collapse show" aria-labelledby="headingGeneral" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>What is ¡Salud!?</h5>
+                                <p>¡Salud! is an AI-powered language learning platform that combines interactive lessons, immersive content, and writing exercises to help users learn languages effectively and naturally.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Which languages can I learn on ¡Salud!?</h5>
+                                <p>Currently, we support Spanish, French, German, Italian, Russian, Chinese, and Japanese. We're constantly working to add more languages based on user demand.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Do I need any prior language knowledge to use ¡Salud!?</h5>
+                                <p>Not at all! ¡Salud! is designed for learners at all levels, from complete beginners to advanced speakers looking to refine their skills.</p>
+                            </div>
+                            
+                            <div>
+                                <h5>How is ¡Salud! different from other language learning apps?</h5>
+                                <p>¡Salud! stands out with its AI-powered personalization, task-based learning approach, and comprehensive suite of tools including journaling, writing exercises, and cultural immersion content. We focus on practical, real-world language skills rather than just vocabulary memorization.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account & Subscription -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAccount">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccount" aria-expanded="false" aria-controls="collapseAccount">
+                            <i class="fas fa-user-circle me-2"></i> Account & Subscription
+                        </button>
+                    </h2>
+                    <div id="collapseAccount" class="accordion-collapse collapse" aria-labelledby="headingAccount" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>How do I create an account?</h5>
+                                <p>Click on the "Sign Up" button in the top right corner of the page, fill in your details, and verify your email address to get started.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>What's included in the free tier?</h5>
+                                <p>The free tier includes access to thousands of hours of audio with transcripts, limited word saving (up to 20 per day), basic lesson generation, and core community features.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>What additional features do I get with Premium?</h5>
+                                <p>Premium subscribers get unlimited saved words, auto-generated audio for imported lessons, full sentence translations, advanced statistics, offline access, AI-assisted grammar guides, and an enhanced vocabulary system with flashcards.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Can I cancel my subscription at any time?</h5>
+                                <p>Yes, you can cancel your subscription at any time. If you cancel, you'll still have access to premium features until the end of your current billing period.</p>
+                            </div>
+                            
+                            <div>
+                                <h5>Is there a student discount?</h5>
+                                <p>Yes, we offer a 15% discount for students. Please contact our support team with proof of your student status to receive your discount code.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features & Learning -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFeatures">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFeatures" aria-expanded="false" aria-controls="collapseFeatures">
+                            <i class="fas fa-book-open me-2"></i> Features & Learning
+                        </button>
+                    </h2>
+                    <div id="collapseFeatures" class="accordion-collapse collapse" aria-labelledby="headingFeatures" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>How do the interactive lessons work?</h5>
+                                <p>Our interactive lessons use a task-based approach, guiding you through real-world scenarios to develop practical language skills. Each lesson includes vocabulary, grammar explanations, interactive exercises, and cultural notes.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>What is the journaling feature?</h5>
+                                <p>The journaling feature allows you to write daily entries in your target language. Our AI provides feedback on your writing, helping you improve your grammar, vocabulary, and expression.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>How does the vocabulary system work?</h5>
+                                <p>When you encounter unknown words, you can save them to your personal vocabulary list. The system uses spaced repetition to help you review these words at optimal intervals for long-term retention.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Can I import my own content?</h5>
+                                <p>Yes! You can import articles, stories, or YouTube videos with transcriptions. Our system will process the content and make it available for interactive learning, allowing you to tap on words for translations and save them to your vocabulary list.</p>
+                            </div>
+                            
+                            <div>
+                                <h5>How accurate is the AI feedback?</h5>
+                                <p>Our AI feedback system is highly accurate for grammar, vocabulary, and basic stylistic suggestions. While it's not perfect, it's continuously improving through machine learning and user feedback.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Technical Support -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSupport">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSupport" aria-expanded="false" aria-controls="collapseSupport">
+                            <i class="fas fa-headset me-2"></i> Technical Support
+                        </button>
+                    </h2>
+                    <div id="collapseSupport" class="accordion-collapse collapse" aria-labelledby="headingSupport" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <h5>What devices can I use ¡Salud! on?</h5>
+                                <p>¡Salud! works on any device with a modern web browser, including desktops, laptops, tablets, and smartphones. We recommend using Chrome, Firefox, Safari, or Edge for the best experience.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>Is there an offline mode?</h5>
+                                <p>Premium subscribers can download lessons and saved content for offline use. This feature is available on our mobile apps (coming soon).</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5>How do I report a bug or issue?</h5>
+                                <p>If you encounter any issues, please contact our support team through the "Contact Us" page or email support@salud.com with details about the problem, including screenshots if possible.</p>
+                            </div>
+                            
+                            <div>
+                                <h5>How can I suggest a new feature?</h5>
+                                <p>We love hearing from our users! You can suggest new features through the feedback form in your account settings or by emailing suggestions@salud.com.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow mt-5">
+                <div class="card-body text-center">
+                    <h3 class="mb-3">Still have questions?</h3>
+                    <p class="mb-4">Our support team is here to help you with any questions or concerns.</p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

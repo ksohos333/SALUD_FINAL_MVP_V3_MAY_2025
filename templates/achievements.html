@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Achievements - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 mb-0">My Achievements</h1>
+            <p class="lead text-muted">Track your progress and earn rewards as you learn.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="achievementFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i> All Achievements
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="achievementFilter">
+                    <li><a class="dropdown-item active" href="#">All Achievements</a></li>
+                    <li><a class="dropdown-item" href="#">Unlocked</a></li>
+                    <li><a class="dropdown-item" href="#">Locked</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Streak</a></li>
+                    <li><a class="dropdown-item" href="#">Lessons</a></li>
+                    <li><a class="dropdown-item" href="#">Vocabulary</a></li>
+                    <li><a class="dropdown-item" href="#">Writing</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Achievements</h5>
+                    <div class="display-4 fw-bold text-primary">{{ total_achievements|default(24) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Unlocked</h5>
+                    <div class="display-4 fw-bold text-success">{{ unlocked_achievements|default(8) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">In Progress</h5>
+                    <div class="display-4 fw-bold text-warning">{{ in_progress_achievements|default(5) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Locked</h5>
+                    <div class="display-4 fw-bold text-secondary">{{ locked_achievements|default(11) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Streak Achievements -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Streak Achievements</h2>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-fire fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">7-Day Streak</h5>
+                                    <p class="card-text small text-muted">Practice for 7 consecutive days</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on March 1, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body text-center">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-fire fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">14-Day Streak</h5>
+                                    <p class="card-text small text-muted">Practice for 14 consecutive days</p>
+                                    <div class="badge bg-warning text-dark mb-2">In Progress</div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="small text-muted mb-0">7/10 days completed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-fire fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">30-Day Streak</h5>
+                                    <p class="card-text small text-muted">Practice for 30 consecutive days</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete 14-Day Streak first</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-fire fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">100-Day Streak</h5>
+                                    <p class="card-text small text-muted">Practice for 100 consecutive days</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete 30-Day Streak first</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Achievements -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Lesson Achievements</h2>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book-open fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">First Lesson</h5>
+                                    <p class="card-text small text-muted">Complete your first lesson</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on February 25, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book-open fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">5 Lessons</h5>
+                                    <p class="card-text small text-muted">Complete 5 lessons</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on February 28, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body text-center">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book-open fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">10 Lessons</h5>
+                                    <p class="card-text small text-muted">Complete 10 lessons</p>
+                                    <div class="badge bg-warning text-dark mb-2">In Progress</div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="small text-muted mb-0">8/10 lessons completed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book-open fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">25 Lessons</h5>
+                                    <p class="card-text small text-muted">Complete 25 lessons</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete 10 Lessons first</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Achievements -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Vocabulary Achievements</h2>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Word Collector</h5>
+                                    <p class="card-text small text-muted">Save 10 words to your vocabulary</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on February 26, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Vocabulary Builder</h5>
+                                    <p class="card-text small text-muted">Save 50 words to your vocabulary</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on March 2, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body text-center">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Word Master</h5>
+                                    <p class="card-text small text-muted">Save 100 words to your vocabulary</p>
+                                    <div class="badge bg-warning text-dark mb-2">In Progress</div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="small text-muted mb-0">65/100 words saved</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Lexicon Legend</h5>
+                                    <p class="card-text small text-muted">Save 500 words to your vocabulary</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete Word Master first</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Writing Achievements -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="h4 mb-3">Writing Achievements</h2>
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-body text-center">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-pen fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">First Entry</h5>
+                                    <p class="card-text small text-muted">Complete your first writing exercise</p>
+                                    <div class="badge bg-success mb-2">Unlocked</div>
+                                    <p class="small text-muted mb-0">Unlocked on February 27, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body text-center">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-pen fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Writing Novice</h5>
+                                    <p class="card-text small text-muted">Complete 5 writing exercises</p>
+                                    <div class="badge bg-warning text-dark mb-2">In Progress</div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="small text-muted mb-0">2/5 exercises completed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-pen fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Writing Enthusiast</h5>
+                                    <p class="card-text small text-muted">Complete 15 writing exercises</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete Writing Novice first</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 border-secondary">
+                                <div class="card-body text-center">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-pen fa-2x"></i>
+                                    </div>
+                                    <h5 class="card-title">Writing Master</h5>
+                                    <p class="card-text small text-muted">Complete 30 writing exercises</p>
+                                    <div class="badge bg-secondary mb-2">Locked</div>
+                                    <p class="small text-muted mb-0">Complete Writing Enthusiast first</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

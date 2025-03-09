@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}About - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 mb-4">About ¡Salud!</h1>
+            
+            <div class="card shadow mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Our Mission</h2>
+                    <p class="lead">¡Salud! is dedicated to empowering language learners to overcome linguistic and social barriers through an innovative, AI-powered learning platform.</p>
+                    
+                    <p>We believe that language learning should be:</p>
+                    <ul>
+                        <li><strong>Immersive</strong> - Learning in context with real-world applications</li>
+                        <li><strong>Personalized</strong> - Adapting to your learning style and goals</li>
+                        <li><strong>Engaging</strong> - Making the learning process enjoyable and effective</li>
+                        <li><strong>Holistic</strong> - Combining language skills with cultural understanding</li>
+                    </ul>
+                    
+                    <p>Our platform integrates cutting-edge AI technology with proven language learning methodologies to create a unique learning experience that helps you achieve fluency faster and more effectively than traditional methods.</p>
+                </div>
+            </div>
+            
+            <div class="card shadow mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Our Approach</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <i class="fas fa-tasks fa-3x text-primary"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="h5">Task-Based Learning</h3>
+                            <p>Our lessons focus on real-world, purpose-driven tasks that help you develop practical language skills you can use immediately.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <i class="fas fa-brain fa-3x text-primary"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="h5">Comprehensible Input</h3>
+                            <p>We provide content that's just challenging enough to push your skills forward, but still understandable through contextual examples.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <i class="fas fa-sync-alt fa-3x text-primary"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="h5">Spaced Repetition</h3>
+                            <p>Our flashcard and vocabulary systems use scientifically-proven spaced repetition to help you remember words and phrases long-term.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <i class="fas fa-comments fa-3x text-primary"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h3 class="h5">Interactive Feedback</h3>
+                            <p>Get real-time AI feedback on your writing and grammar exercises to help you internalize correct language usage.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow mb-5">
+                <div class="card-body">
+                    <h2 class="h3 mb-4">Our Team</h2>
+                    
+                    <p>¡Salud! was founded by a team of language enthusiasts, educators, and technology experts who share a passion for making language learning more accessible and effective.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="h5">Maria Rodriguez</h4>
+                            <p class="text-muted">Founder & CEO</p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="h5">David Chen</h4>
+                            <p class="text-muted">CTO</p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-primary"></i>
+                            </div>
+                            <h4 class="h5">Sophie Martin</h4>
+                            <p class="text-muted">Head of Education</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h2 class="h3 mb-4">Join Us on Our Mission</h2>
+                    <p class="lead mb-4">Ready to transform your language learning journey?</p>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-md-2">Get Started</a>
+                        <a href="{{ url_for('contact') }}" class="btn btn-outline-primary btn-lg">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

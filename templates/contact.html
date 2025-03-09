@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 mb-4">Contact Us</h1>
+            <p class="lead mb-5">Have questions, feedback, or need assistance? We're here to help!</p>
+            
+            <div class="row mb-5">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="card h-100 shadow text-center">
+                        <div class="card-body">
+                            <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                            <h3 class="h5">Email Us</h3>
+                            <p class="mb-0">support@salud.com</p>
+                            <p class="text-muted small">Response within 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <div class="card h-100 shadow text-center">
+                        <div class="card-body">
+                            <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                            <h3 class="h5">Live Chat</h3>
+                            <p class="mb-0">Available 9am-5pm EST</p>
+                            <p class="text-muted small">Monday through Friday</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100 shadow text-center">
+                        <div class="card-body">
+                            <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
+                            <h3 class="h5">Our Office</h3>
+                            <p class="mb-0">123 Language Lane</p>
+                            <p class="text-muted small">San Francisco, CA 94103</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Send Us a Message</h2>
+                </div>
+                <div class="card-body">
+                    <form id="contactForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-select" id="subject" required>
+                                <option value="" selected disabled>Select a subject</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="support">Technical Support</option>
+                                <option value="billing">Billing Question</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="newsletter">
+                            <label class="form-check-label" for="newsletter">Subscribe to our newsletter for language learning tips and updates</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow mt-5">
+                <div class="card-body">
+                    <h3 class="h4 mb-4">Frequently Asked Questions</h3>
+                    
+                    <div class="accordion" id="contactFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    How quickly will I receive a response?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#contactFAQ">
+                                <div class="accordion-body">
+                                    We strive to respond to all inquiries within 24 hours during business days. For urgent matters, we recommend using the live chat feature during our operating hours.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Can I request a refund?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#contactFAQ">
+                                <div class="accordion-body">
+                                    Yes, we offer a 14-day money-back guarantee for all new premium subscriptions. Please contact our support team with your account details to process a refund request.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    How can I report a technical issue?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#contactFAQ">
+                                <div class="accordion-body">
+                                    For technical issues, please select "Technical Support" in the subject dropdown above and provide as much detail as possible, including your device, browser, and steps to reproduce the issue. Screenshots are also helpful.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        
+        contactForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // In a real implementation, this would send the form data to a server
+            // For now, we'll just show a success message
+            
+            alert('Thank you for your message! We will get back to you soon.');
+            contactForm.reset();
+        });
+    });
+</script>
+{% endblock %}

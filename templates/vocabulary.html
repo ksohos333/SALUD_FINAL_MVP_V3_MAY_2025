@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+
+{% block title %}Vocabulary - ¡Salud!{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Word tapping */
+    .tappable-word {
+        cursor: pointer;
+        border-bottom: 1px dotted transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tappable-word:hover {
+        border-bottom-color: var(--primary-color);
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    /* Word popup */
+    .word-popup {
+        position: absolute;
+        z-index: 1000;
+        width: 300px;
+        background-color: var(--bg-color, #fff);
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .word-popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background-color: var(--primary-color, #0d6efd);
+        color: white;
+    }
+
+    .word-popup-header h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .close-popup {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .word-popup-body {
+        padding: 16px;
+    }
+
+    .word-popup-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background-color: var(--bg-secondary, #f8f9fa);
+        border-top: 1px solid var(--border-color, #dee2e6);
+    }
+
+    /* Flashcards */
+    .flashcard-container {
+        perspective: 1000px;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+
+    .flashcard {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+        cursor: pointer;
+    }
+
+    .flashcard.flipped {
+        transform: rotateY(180deg);
+    }
+
+    .flashcard-front,
+    .flashcard-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: var(--bg-color, #fff);
+        border: 1px solid var(--border-color, #dee2e6);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .flashcard-back {
+        transform: rotateY(180deg);
+    }
+
+    .flashcard h2 {
+        font-size: 28px;
+        margin-bottom: 16px;
+        text-align: center;
+    }
+
+    .flashcard .context,
+    .flashcard .word-type,
+    .flashcard .notes {
+        text-align: center;
+        margin-bottom: 8px;
+        color: var(--text-secondary, #6c757d);
+    }
+
+    .flashcard-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .flashcard-progress {
+        margin-top: 20px;
+    }
+
+    .flashcard-progress .progress {
+        height: 8px;
+        margin-bottom: 8px;
+    }
+
+    .flashcard-progress p {
+        text-align: center;
+        color: var(--text-secondary, #6c757d);
+        font-size: 14px;
+    }
+
+    /* Notifications */
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 4px;
+        color: white;
+        z-index: 1000;
+        animation: slide-in 0.3s ease;
+    }
+
+    .notification.success {
+        background-color: var(--success-color, #28a745);
+    }
+
+    .notification.error {
+        background-color: var(--danger-color, #dc3545);
+    }
+
+    .notification.fade-out {
+        animation: fade-out 0.5s ease forwards;
+    }
+
+    @keyframes slide-in {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fade-out {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 mb-0">My Vocabulary</h1>
+            <p class="lead text-muted">Review and practice your saved words.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="dropdown d-inline-block">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="languageFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-language me-1"></i> <span id="currentLanguage">Spanish</span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="languageFilter">
+                    <li><a class="dropdown-item active language-option" href="#" data-language="Spanish">Spanish</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="French">French</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="German">German</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="Italian">Italian</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="Russian">Russian</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="Chinese">Chinese</a></li>
+                    <li><a class="dropdown-item language-option" href="#" data-language="Japanese">Japanese</a></li>
+                </ul>
+            </div>
+            <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addWordModal">
+                <i class="fas fa-plus me-1"></i> Add Word
+            </button>
+        </div>
+    </div>
+
+    <!-- Vocabulary Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Words</h5>
+                    <div class="display-4 fw-bold text-primary" id="totalWords">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Mastered</h5>
+                    <div class="display-4 fw-bold text-success" id="masteredWords">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Learning</h5>
+                    <div class="display-4 fw-bold text-warning" id="learningWords">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">New</h5>
+                    <div class="display-4 fw-bold text-info" id="newWords">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs for Vocabulary and Flashcards -->
+    <ul class="nav nav-tabs mb-4" id="vocabularyTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="words-tab" data-bs-toggle="tab" data-bs-target="#words" type="button" role="tab" aria-controls="words" aria-selected="true">My Words</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="flashcards-tab" data-bs-toggle="tab" data-bs-target="#flashcards" type="button" role="tab" aria-controls="flashcards" aria-selected="false">Flashcards</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="false">Reading Content</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="vocabularyTabsContent">
+        <!-- Words Tab -->
+        <div class="tab-pane fade show active" id="words" role="tabpanel" aria-labelledby="words-tab">
+            <!-- Vocabulary Filters -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" id="searchVocabulary" placeholder="Search words...">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                                        <button class="btn btn-sm btn-outline-secondary active filter-btn" data-filter="all">All</button>
+                                        <button class="btn btn-sm btn-outline-success filter-btn" data-filter="mastered">Mastered</button>
+                                        <button class="btn btn-sm btn-outline-warning filter-btn" data-filter="learning">Learning</button>
+                                        <button class="btn btn-sm btn-outline-info filter-btn" data-filter="new">New</button>
+                                        <div class="dropdown ms-2">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="wordTypeFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Word Type
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="wordTypeFilter">
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="all">All Types</a></li>
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="noun">Nouns</a></li>
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="verb">Verbs</a></li>
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="adjective">Adjectives</a></li>
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="adverb">Adverbs</a></li>
+                                                <li><a class="dropdown-item word-type-option" href="#" data-type="phrase">Phrases</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="dropdown ms-2">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="sortFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Sort By
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="sortFilter">
+                                                <li><a class="dropdown-item sort-option" href="#" data-sort="recent">Recently Added</a></li>
+                                                <li><a class="dropdown-item sort-option" href="#" data-sort="az">Alphabetical (A-Z)</a></li>
+                                                <li><a class="dropdown-item sort-option" href="#" data-sort="za">Alphabetical (Z-A)</a></li>
+                                                <li><a class="dropdown-item sort-option" href="#" data-sort="mastery">Mastery Level</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary List -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="vocabularyTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Word</th>
+                                            <th>Translation</th>
+                                            <th>Type</th>
+                                            <th>Mastery</th>
+                                            <th>Last Practiced</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="vocabularyTableBody">
+                                        <!-- Words will be loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="vocabularyEmptyState" class="text-center py-5 d-none">
+                                <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                                <h3 class="h5">No words found</h3>
+                                <p class="text-muted">Add words to your vocabulary or adjust your filters.</p>
+                                <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addWordModal">
+                                    <i class="fas fa-plus me-1"></i> Add Word
+                                </button>
+                            </div>
+                            <nav aria-label="Vocabulary pagination" id="vocabularyPagination">
+                                <ul class="pagination justify-content-center mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flashcards Tab -->
+        <div class="tab-pane fade" id="flashcards" role="tabpanel" aria-labelledby="flashcards-tab">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div id="flashcard-system">
+                                <div class="flashcard-container">
+                                    <div class="flashcard">
+                                        <div class="flashcard-front">
+                                            <h2>Click to start flashcards</h2>
+                                            <p class="text-muted">Your flashcards will appear here</p>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <h2>Translation</h2>
+                                            <p class="word-type">Word type</p>
+                                            <p class="notes">Notes about usage</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard-buttons">
+                                    <button class="btn btn-danger" id="didntKnowBtn" disabled>I didn't know</button>
+                                    <button class="btn btn-success" id="knewBtn" disabled>I knew this</button>
+                                </div>
+                                <div class="flashcard-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <p>0 of 0</p>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-primary" id="startFlashcardsBtn">
+                                        <i class="fas fa-play me-1"></i> Start Flashcards
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Content Tab -->
+        <div class="tab-pane fade" id="content" role="tabpanel" aria-labelledby="content-tab">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Reading Content</h5>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="contentSourceFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select Source
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="contentSourceFilter" id="contentSourceList">
+                                    <li><a class="dropdown-item" href="#" data-source-id="sample">Sample Text</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="readingContent" class="tappable-content">
+                                <h3>Tap on any word to save it to your vocabulary</h3>
+                                <p>This is a sample text to demonstrate the word tapping functionality. In a real implementation, this would be replaced with actual content from various sources like articles, stories, or transcripts.</p>
+                                <p>When you tap on a word, a popup will appear allowing you to save it to your vocabulary with a translation and notes. You can also use the AI translation feature to automatically translate and analyze the word.</p>
+                                <p>Try tapping on any word in this text to see how it works!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Import Content</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="contentTitle" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="contentTitle" placeholder="Enter a title for this content">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contentType" class="form-label">Content Type</label>
+                                <select class="form-select" id="contentType">
+                                    <option value="article">Article</option>
+                                    <option value="story">Story</option>
+                                    <option value="transcript">Transcript</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contentText" class="form-label">Content</label>
+                                <textarea class="form-control" id="contentText" rows="5" placeholder="Paste or type content here"></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" id="importContentBtn">
+                                    <i class="fas fa-file-import me-1"></i> Import Content
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5 class="mb-0">YouTube Import</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="youtubeUrl" class="form-label">YouTube URL</label>
+                                <input type="text" class="form-control" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-danger" id="importYoutubeBtn">
+                                    <i class="fab fa-youtube me-1"></i> Import from YouTube
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Word Modal -->
+<div class="modal fade" id="addWordModal" tabindex="-1" aria-labelledby="addWordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWordModalLabel">Add New Word</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWordForm">
+                    <div class="mb-3">
+                        <label for="wordText" class="form-label">Word or Phrase</label>
+                        <input type="text" class="form-control" id="wordText" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wordTranslation" class="form-label">Translation</label>
+                        <input type="text" class="form-control" id="wordTranslation" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wordType" class="form-label">Word Type</label>
+                        <select class="form-select" id="wordType" required>
+                            <option value="" selected disabled>Select word type</option>
+                            <option value="noun">Noun</option>
+                            <option value="verb">Verb</option>
+                            <option value="adjective">Adjective</option>
+                            <option value="adverb">Adverb</option>
+                            <option value="phrase">Phrase</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wordNotes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="wordNotes" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wordTags" class="form-label">Tags (Optional)</label>
+                        <input type="text" class="form-control" id="wordTags" placeholder="Separate tags with commas">
+                        <div class="form-text">Example: food, restaurant, travel</div>
+                    </div>
+                    <input type="hidden" id="wordLanguage" value="Spanish">
+                    <input type="hidden" id="wordContext" value="">
+                    <input type="hidden" id="wordSourceId" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveWordBtn">Add Word</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,612 @@
+{% extends "base.html" %}
+
+{% block title %}¡Salud! - Cultural Immersion{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Cultural Immersion</h1>
+            
+            <ul class="nav nav-tabs mb-4" id="immersionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="content-tab" data-bs-toggle="tab" data-bs-target="#content" type="button" role="tab" aria-controls="content" aria-selected="true">
+                        <i class="fas fa-book me-1"></i> Reading Content
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cultural-tab" data-bs-toggle="tab" data-bs-target="#cultural" type="button" role="tab" aria-controls="cultural" aria-selected="false">
+                        <i class="fas fa-globe-americas me-1"></i> Cultural Insights
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab" aria-controls="youtube" aria-selected="false">
+                        <i class="fab fa-youtube me-1"></i> YouTube Learning
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import" type="button" role="tab" aria-controls="import" aria-selected="false">
+                        <i class="fas fa-file-import me-1"></i> Import Content
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="immersionTabsContent">
+                <!-- Reading Content Tab -->
+                <div class="tab-pane fade show active" id="content" role="tabpanel" aria-labelledby="content-tab">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Generate Reading Content</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="immersion-content-form" class="api-form">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="language" class="form-label">Language</label>
+                                        <select class="form-select" id="language" name="language">
+                                            <option value="Spanish" selected>Spanish</option>
+                                            <option value="French">French</option>
+                                            <option value="German">German</option>
+                                            <option value="Italian">Italian</option>
+                                            <option value="Russian">Russian</option>
+                                            <option value="Chinese">Chinese</option>
+                                            <option value="Japanese">Japanese</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="type" class="form-label">Content Type</label>
+                                        <select class="form-select" id="type" name="type">
+                                            <option value="article" selected>Article</option>
+                                            <option value="story">Short Story</option>
+                                            <option value="dialogue">Dialogue</option>
+                                            <option value="poem">Poem</option>
+                                            <option value="news">News</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="difficulty" class="form-label">Difficulty</label>
+                                        <select class="form-select" id="difficulty" name="difficulty">
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate" selected>Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="topic" class="form-label">Topic (Optional)</label>
+                                    <input type="text" class="form-control" id="topic" name="topic" placeholder="e.g., technology, environment, daily life, etc.">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-magic me-1"></i> Generate Content
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div id="immersion-content-form-result"></div>
+                </div>
+                
+                <!-- Cultural Insights Tab -->
+                <div class="tab-pane fade" id="cultural" role="tabpanel" aria-labelledby="cultural-tab">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Cultural Insights</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Explore cultural aspects of your target language to gain deeper understanding and context.</p>
+                            
+                            <form id="cultural-content-form" class="api-form">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="cultural-language" class="form-label">Language</label>
+                                        <select class="form-select" id="cultural-language" name="language">
+                                            <option value="Spanish" selected>Spanish</option>
+                                            <option value="French">French</option>
+                                            <option value="German">German</option>
+                                            <option value="Italian">Italian</option>
+                                            <option value="Russian">Russian</option>
+                                            <option value="Chinese">Chinese</option>
+                                            <option value="Japanese">Japanese</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="aspect" class="form-label">Cultural Aspect</label>
+                                        <select class="form-select" id="aspect" name="aspect">
+                                            <option value="traditions" selected>Traditions</option>
+                                            <option value="food">Food & Cuisine</option>
+                                            <option value="history">History</option>
+                                            <option value="etiquette">Etiquette & Customs</option>
+                                            <option value="arts">Arts & Literature</option>
+                                            <option value="holidays">Holidays & Celebrations</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="region" class="form-label">Specific Region (Optional)</label>
+                                    <input type="text" class="form-control" id="region" name="region" placeholder="e.g., Andalusia, Quebec, Bavaria, etc.">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-globe me-1"></i> Explore Culture
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div id="cultural-content-form-result"></div>
+                </div>
+                
+                <!-- YouTube Learning Tab -->
+                <div class="tab-pane fade" id="youtube" role="tabpanel" aria-labelledby="youtube-tab">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">YouTube Learning</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Learn from YouTube videos in your target language. Paste a YouTube URL below to get a transcript with vocabulary and comprehension questions.</p>
+                            
+                            <form id="youtube-processor-form" class="api-form">
+                                <div class="mb-3">
+                                    <label for="youtube-url" class="form-label">YouTube Video URL</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="youtube-url" placeholder="https://www.youtube.com/watch?v=...">
+                                        <button class="btn btn-outline-secondary" type="button" id="preview-youtube">Preview</button>
+                                    </div>
+                                </div>
+                                
+                                <div id="youtube-preview" class="mb-3"></div>
+                                
+                                <div class="mb-3">
+                                    <label for="youtube-language" class="form-label">Video Language</label>
+                                    <select class="form-select" id="youtube-language" name="language">
+                                        <option value="Spanish" selected>Spanish</option>
+                                        <option value="French">French</option>
+                                        <option value="German">German</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Russian">Russian</option>
+                                        <option value="Chinese">Chinese</option>
+                                        <option value="Japanese">Japanese</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="video-title" class="form-label">Video Title</label>
+                                    <input type="text" class="form-control" id="video-title" name="title" placeholder="Enter the title of the video">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="transcript" class="form-label">Video Transcript</label>
+                                    <textarea class="form-control" id="transcript" name="transcript" rows="6" placeholder="Paste the transcript here..."></textarea>
+                                    <div class="form-text">You can find transcripts by clicking the "..." button under YouTube videos and selecting "Show transcript".</div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-closed-captioning me-1"></i> Process Video
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div id="youtube-processor-form-result"></div>
+                </div>
+                
+                <!-- Import Content Tab -->
+                <div class="tab-pane fade" id="import" role="tabpanel" aria-labelledby="import-tab">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Import Content</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Import your own content in your target language. Paste text from articles, books, or other sources to get vocabulary and comprehension questions.</p>
+                            
+                            <form id="import-content-form" class="api-form">
+                                <div class="mb-3">
+                                    <label for="content-title" class="form-label">Content Title</label>
+                                    <input type="text" class="form-control" id="content-title" name="title" placeholder="Enter a title for this content">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="import-language" class="form-label">Language</label>
+                                    <select class="form-select" id="import-language" name="language">
+                                        <option value="Spanish" selected>Spanish</option>
+                                        <option value="French">French</option>
+                                        <option value="German">German</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Russian">Russian</option>
+                                        <option value="Chinese">Chinese</option>
+                                        <option value="Japanese">Japanese</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="content-type" class="form-label">Content Type</label>
+                                    <select class="form-select" id="content-type" name="content_type">
+                                        <option value="article" selected>Article</option>
+                                        <option value="news">News</option>
+                                        <option value="book_excerpt">Book Excerpt</option>
+                                        <option value="blog">Blog Post</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="source" class="form-label">Source (Optional)</label>
+                                    <input type="text" class="form-control" id="source" name="source" placeholder="e.g., newspaper name, website, book title, etc.">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Content</label>
+                                    <textarea class="form-control" id="content" name="content" rows="10" placeholder="Paste the content here..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-file-import me-1"></i> Process Content
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div id="import-content-form-result"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Immersion Tips</h5>
+                </div>
+                <div class="card-body">
+                    <h6>1. Read Actively</h6>
+                    <p>Don't just passively read. Highlight unknown words, take notes, and try to summarize what you've read.</p>
+                    
+                    <h6>2. Use the LingQ Method</h6>
+                    <p>Tap on unknown words to save them to your vocabulary list. Review these words regularly with flashcards.</p>
+                    
+                    <h6>3. Context Over Translation</h6>
+                    <p>Try to understand words from context before reaching for a dictionary. This builds stronger neural connections.</p>
+                    
+                    <h6>4. Daily Immersion</h6>
+                    <p>Even 15-20 minutes of daily immersion is more effective than several hours once a week.</p>
+                    
+                    <h6>5. Combine Methods</h6>
+                    <p>Mix reading with listening to the same content for a more complete learning experience.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Content</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">La tecnología del futuro</h6>
+                            <small>Article</small>
+                        </div>
+                        <small class="text-muted">Spanish • Intermediate</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Tradiciones de la Navidad</h6>
+                            <small>Cultural</small>
+                        </div>
+                        <small class="text-muted">Spanish • Beginner</small>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">El cambio climático</h6>
+                            <small>YouTube</small>
+                        </div>
+                        <small class="text-muted">Spanish • Advanced</small>
+                    </a>
+                </div>
+                <div class="card-footer">
+                    <a href="/immersion/history" class="btn btn-sm btn-outline-secondary w-100">View Content History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Custom handler for displaying immersion content
+        window.displayImmersionContent = function(content, container) {
+            if (!content) {
+                container.innerHTML = '<div class="alert alert-warning">No content available</div>';
+                return;
+            }
+            
+            // Determine if this is cultural content or regular immersion content
+            const isCultural = content.cultural_aspect !== undefined;
+            
+            let headerTitle = isCultural ? 'Cultural Insights' : 'Immersion Content';
+            let headerClass = isCultural ? 'bg-warning text-dark' : 'bg-primary text-white';
+            
+            // Extract title
+            const title = content.title || 'Untitled Content';
+            
+            // Format the content based on type
+            let formattedContent = '';
+            let vocabulary = '';
+            let questions = '';
+            
+            if (isCultural) {
+                // For cultural content
+                formattedContent = content.content.replace(/\n/g, '<br>');
+            } else if (content.raw_content) {
+                // For regular immersion content
+                const rawContent = content.raw_content;
+                
+                // Try to extract vocabulary and questions
+                const vocabMatch = rawContent.match(/vocabulary|vocabulario|palabras clave/i);
+                const questionsMatch = rawContent.match(/questions|preguntas|comprehension/i);
+                
+                if (vocabMatch && questionsMatch) {
+                    // If we found both sections
+                    const vocabIndex = vocabMatch.index;
+                    const questionsIndex = questionsMatch.index;
+                    
+                    if (vocabIndex < questionsIndex) {
+                        // Vocabulary comes before questions
+                        formattedContent = rawContent.substring(0, vocabIndex).trim();
+                        vocabulary = rawContent.substring(vocabIndex, questionsIndex).trim();
+                        questions = rawContent.substring(questionsIndex).trim();
+                    } else {
+                        // Questions come before vocabulary
+                        formattedContent = rawContent.substring(0, questionsIndex).trim();
+                        questions = rawContent.substring(questionsIndex, vocabIndex).trim();
+                        vocabulary = rawContent.substring(vocabIndex).trim();
+                    }
+                } else {
+                    // If we couldn't find clear sections, just use the whole content
+                    formattedContent = rawContent;
+                }
+                
+                // Replace newlines with <br> tags
+                formattedContent = formattedContent.replace(/\n/g, '<br>');
+                vocabulary = vocabulary.replace(/\n/g, '<br>');
+                questions = questions.replace(/\n/g, '<br>');
+            }
+            
+            // Build the HTML
+            let html = `
+                <div class="card immersion-content mb-4">
+                    <div class="card-header ${headerClass}">
+                        <h3 class="mb-0">${title}</h3>
+                        <div class="small">
+            `;
+            
+            // Add badges based on content type
+            if (isCultural) {
+                html += `
+                    <span class="badge bg-light text-dark me-2">${content.language}</span>
+                    <span class="badge bg-light text-dark me-2">${content.cultural_aspect}</span>
+                `;
+                
+                if (content.region) {
+                    html += `<span class="badge bg-light text-dark">${content.region}</span>`;
+                }
+            } else {
+                html += `
+                    <span class="badge bg-light text-dark me-2">${content.language}</span>
+                    <span class="badge bg-light text-dark me-2">${content.content_type || 'Article'}</span>
+                    <span class="badge bg-light text-dark">${content.difficulty || 'Intermediate'}</span>
+                `;
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="content-text mb-4">
+                            ${formattedContent}
+                        </div>
+            `;
+            
+            // Add vocabulary and questions sections if they exist
+            if (vocabulary) {
+                html += `
+                    <div class="vocabulary-section mb-4">
+                        <h4>Key Vocabulary</h4>
+                        <div>${vocabulary}</div>
+                    </div>
+                `;
+            }
+            
+            if (questions) {
+                html += `
+                    <div class="questions-section">
+                        <h4>Comprehension Questions</h4>
+                        <div>${questions}</div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button class="btn btn-sm btn-outline-primary" onclick="printContent()">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="saveContent('${content.id}')">
+                            <i class="fas fa-save me-1"></i> Save
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        };
+        
+        // Custom handler for displaying YouTube content
+        window.displayYouTubeContent = function(content, container) {
+            if (!content) {
+                container.innerHTML = '<div class="alert alert-warning">No content available</div>';
+                return;
+            }
+            
+            const videoId = content.video_id;
+            const title = content.title || 'YouTube Video';
+            const transcript = content.transcript || '';
+            const aiAdditions = content.ai_additions || '';
+            
+            let html = `
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h3 class="mb-0">${title}</h3>
+                        <div class="small">
+                            <span class="badge bg-light text-dark me-2">${content.language}</span>
+                            <span class="badge bg-light text-dark">YouTube</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+            `;
+            
+            // Add video embed if we have a video ID
+            if (videoId) {
+                html += `
+                    <div class="ratio ratio-16x9 mb-4">
+                        <iframe src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                `;
+            }
+            
+            // Add transcript
+            html += `
+                <div class="transcript-section mb-4">
+                    <h4>Transcript</h4>
+                    <div class="transcript-text p-3 bg-light rounded">
+                        ${transcript.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+            
+            // Add AI additions if available
+            if (aiAdditions) {
+                html += `
+                    <div class="ai-additions-section">
+                        <h4>Vocabulary & Questions</h4>
+                        <div class="ai-additions-text">
+                            ${aiAdditions.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button class="btn btn-sm btn-outline-primary" onclick="printContent()">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="saveContent('${content.id}')">
+                            <i class="fas fa-save me-1"></i> Save
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        };
+        
+        // Custom handler for displaying imported content
+        window.displayImportedContent = function(content, container) {
+            if (!content) {
+                container.innerHTML = '<div class="alert alert-warning">No content available</div>';
+                return;
+            }
+            
+            const title = content.title || 'Imported Content';
+            const contentText = content.content || '';
+            const aiAdditions = content.ai_additions || '';
+            
+            let html = `
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0">${title}</h3>
+                        <div class="small">
+                            <span class="badge bg-light text-dark me-2">${content.language}</span>
+                            <span class="badge bg-light text-dark me-2">${content.content_type || 'Article'}</span>
+            `;
+            
+            if (content.source) {
+                html += `<span class="badge bg-light text-dark">Source: ${content.source}</span>`;
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="content-text mb-4">
+                            ${contentText.replace(/\n/g, '<br>')}
+                        </div>
+            `;
+            
+            // Add AI additions if available
+            if (aiAdditions) {
+                html += `
+                    <div class="ai-additions-section">
+                        <h4>Vocabulary & Questions</h4>
+                        <div class="ai-additions-text">
+                            ${aiAdditions.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button class="btn btn-sm btn-outline-primary" onclick="printContent()">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" onclick="saveContent('${content.id}')">
+                            <i class="fas fa-save me-1"></i> Save
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        };
+    });
+    
+    // Print content
+    function printContent() {
+        window.print();
+    }
+    
+    // Save content to user's saved content
+    function saveContent(contentId) {
+        // This would typically make an API call to save the content to the user's account
+        alert('Content saved successfully!');
+    }
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .navbar, .footer, .card-footer, .nav-tabs, .card-header {
+            display: none !important;
+        }
+        
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .card-body {
+            padding: 0 !important;
+        }
+    }
+    
+    .transcript-text {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
