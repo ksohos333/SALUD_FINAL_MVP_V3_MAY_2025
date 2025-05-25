@@ -1,16 +1,344 @@
 {% extends "base.html" %}
 
-{% block title %}¡Salud! - Interactive Lessons{% endblock %}
+{% block title %}¡Salud! - Library{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row">
-        <div class="col-lg-8">
-            <h1 class="mb-4">Interactive Language Lessons</h1>
-            
-            <div class="card mb-4">
+<div class="container-fluid py-4">
+    <!-- Top Navigation Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Library</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Playlists</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Vocabulary</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Search Bar and Level Filter -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search lessons...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex align-items-center">
+                <span class="me-2">Beginner 1</span>
+                <input type="range" class="form-range mx-2" min="1" max="5" step="1" value="1" id="levelRange">
+                <span class="ms-2">Advanced</span>
+            </div>
+        </div>
+        <div class="col-md-2 text-end">
+            <button class="btn btn-primary">
+                <i class="fas fa-upload me-1"></i> Import
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Source Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 content-source-card">
+                <div class="card-body text-center">
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="¡Salud! Logo" class="img-fluid mb-3" style="max-height: 60px;">
+                    <h5 class="card-title">¡Salud! Originals</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 content-source-card">
+                <div class="card-body text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png" alt="Netflix" class="img-fluid mb-3" style="max-height: 60px;">
+                    <h5 class="card-title">Netflix</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 content-source-card">
+                <div class="card-body text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Deutsche_Welle_Logo.svg/1200px-Deutsche_Welle_Logo.svg.png" alt="Deutsche Welle" class="img-fluid mb-3" style="max-height: 60px;">
+                    <h5 class="card-title">Deutsche Welle</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 content-source-card">
+                <div class="card-body text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/2560px-YouTube_full-color_icon_%282017%29.svg.png" alt="YouTube" class="img-fluid mb-3" style="max-height: 60px;">
+                    <h5 class="card-title">YouTube</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Studying Section -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h3>Continue Studying</h3>
+            <a href="#" class="text-decoration-none">View all <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+    </div>
+
+    <!-- Lesson Cards -->
+    <div class="row mb-5">
+        <!-- Lesson Card 1 -->
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-primary d-flex align-items-center justify-content-center" style="height: 150px;">
+                        <span class="display-4 text-white">1</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">22</span>
+                        <span class="badge bg-warning text-dark">16</span>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 p-2">
+                        <button class="btn btn-sm btn-light rounded-circle">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Generate a New Lesson</h5>
+                    <h5 class="card-title">Hallo. Wie geht es Ihnen?</h5>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">58% New Words</span>
+                        <span class="text-muted">¡Salud! 101 - Getting Started</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson Card 2 -->
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-warning d-flex align-items-center justify-content-center" style="height: 150px;">
+                        <span class="display-4 text-white">2</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">244</span>
+                        <span class="badge bg-warning text-dark">11</span>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 p-2">
+                        <button class="btn btn-sm btn-light rounded-circle">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Die NSDAP steigt auf - Diktatur des Nationalsozialismus</h5>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">96% New Words</span>
+                        <span class="text-muted">Video lessons from YouTube</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson Card 3 -->
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-info d-flex align-items-center justify-content-center" style="height: 150px;">
+                        <span class="display-4 text-white">3</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">152</span>
+                        <span class="badge bg-warning text-dark">5</span>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 p-2">
+                        <button class="btn btn-sm btn-light rounded-circle">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Nicos Weg - A2 - Folge 41</h5>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">97% New Words</span>
+                        <span class="text-muted">Nicos Weg A2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson Card 4 -->
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-success d-flex align-items-center justify-content-center" style="height: 150px;">
+                        <span class="display-4 text-white">4</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">98</span>
+                        <span class="badge bg-warning text-dark">7</span>
+                    </div>
+                    <div class="position-absolute bottom-0 end-0 p-2">
+                        <button class="btn btn-sm btn-light rounded-circle">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Mein erster Tag in Deutschland</h5>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">85% New Words</span>
+                        <span class="text-muted">¡Salud! Beginner Stories</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- For You Section -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h3>For You</h3>
+            <a href="#" class="text-decoration-none">View all <i class="fas fa-chevron-right ms-1"></i></a>
+        </div>
+    </div>
+
+    <!-- For You Lesson Cards -->
+    <div class="row mb-5">
+        <!-- For You Card 1 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-primary d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">1a</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">55</span>
+                        <span class="badge bg-warning text-dark">1</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">1a - Markus ist ein Koch, Teil 1</h5>
+                    <div class="text-muted">98% New Words</div>
+                    <div class="text-muted">¡Salud! Mini Stories</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For You Card 2 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-primary d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">1b</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">58</span>
+                        <span class="badge bg-warning text-dark">1</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">1b - Markus ist ein Koch, Teil 2</h5>
+                    <div class="text-muted">98% New Words</div>
+                    <div class="text-muted">¡Salud! Mini Stories</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For You Card 3 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-info d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">A1</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">47</span>
+                        <span class="badge bg-warning text-dark">0</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Nicos Weg- A1 - Folge 1: Hallo!</h5>
+                    <div class="text-muted">89% New Words</div>
+                    <div class="text-muted">Nicos Weg - A1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For You Card 4 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-success d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">2</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">82</span>
+                        <span class="badge bg-warning text-dark">2</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">2 - Tobias will Urlaub machen</h5>
+                    <div class="text-muted">98% New Words</div>
+                    <div class="text-muted">¡Salud! Mini Stories</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For You Card 5 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-primary d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">1c</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">67</span>
+                        <span class="badge bg-warning text-dark">1</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">1c - Markus ist ein Koch, Fragen</h5>
+                    <div class="text-muted">99% New Words</div>
+                    <div class="text-muted">¡Salud! Mini Stories</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- For You Card 6 -->
+        <div class="col-md-4 col-lg-2 mb-4">
+            <div class="card lesson-card h-100">
+                <div class="position-relative">
+                    <div class="lesson-thumbnail bg-danger d-flex align-items-center justify-content-center" style="height: 150px; border-radius: 50%; width: 150px; margin: 0 auto;">
+                        <span class="display-4 text-white">3</span>
+                    </div>
+                    <div class="position-absolute top-0 end-0 p-2">
+                        <span class="badge bg-primary">85</span>
+                        <span class="badge bg-warning text-dark">0</span>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">3 - Kathrin bekommt eine Katze</h5>
+                    <div class="text-muted">93% New Words</div>
+                    <div class="text-muted">¡Salud! Mini Stories</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Lesson Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Generate a New Lesson</h5>
+                </div>
+                <div class="card-body">
                     <form id="lesson-generator-form" class="api-form">
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -52,75 +380,7 @@
                 </div>
             </div>
             
-            <div id="lesson-generator-form-result"></div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Subject-Based Learning</h5>
-                </div>
-                <div class="card-body">
-                    <p>Learn a subject in your target language! This immersive approach helps you acquire language naturally while learning about topics that interest you.</p>
-                    <form id="subject-lesson-form" class="api-form">
-                        <input type="hidden" name="language" value="Spanish">
-                        <input type="hidden" name="level" value="intermediate">
-                        
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Subject</label>
-                            <select class="form-select" id="subject" name="subject">
-                                <option value="mathematics" selected>Mathematics</option>
-                                <option value="history">History</option>
-                                <option value="science">Science</option>
-                                <option value="art">Art</option>
-                                <option value="music">Music</option>
-                                <option value="philosophy">Philosophy</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="subject_topic" class="form-label">Topic</label>
-                            <input type="text" class="form-control" id="subject_topic" name="topic" placeholder="e.g., basic arithmetic, renaissance, etc.">
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary">
-                            <i class="fas fa-graduation-cap me-1"></i> Generate Subject Lesson
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Recent Lessons</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Greetings and Introductions</h6>
-                            <small>Spanish</small>
-                        </div>
-                        <small class="text-muted">Beginner level</small>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Ordering Food at a Restaurant</h6>
-                            <small>Spanish</small>
-                        </div>
-                        <small class="text-muted">Intermediate level</small>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Discussing Current Events</h6>
-                            <small>Spanish</small>
-                        </div>
-                        <small class="text-muted">Advanced level</small>
-                    </a>
-                </div>
-                <div class="card-footer">
-                    <a href="/lessons/history" class="btn btn-sm btn-outline-secondary w-100">View All Lessons</a>
-                </div>
-            </div>
-            
-            <div id="subject-lesson-form-result" class="mt-4"></div>
+            <div id="lesson-generator-form-result" class="mt-4"></div>
         </div>
     </div>
 </div>

@@ -225,3 +225,125 @@ class LessonProgress(db.Model):
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
         }
+
+class LearningPhase(db.Model):
+    """Model for tracking user learning phases (immersion, output, etc.)"""
+    __tablename__ = 'learning_phases'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    phase_type = db.Column(db.String(50), default='immersion')  # 'immersion' or 'output'
+    immersion_hours = db.Column(db.Float, default=0.0)  # Total hours spent in immersion
+    target_immersion_hours = db.Column(db.Float, default=50.0)  # Target hours before moving to output phase
+    started_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('learning_phase', uselist=False))
+    
+    def is_ready_for_output(self):
+        """Check if user has completed enough immersion hours to move to output phase"""
+        return self.phase_type == 'immersion' and self.immersion_hours >= self.target_immersion_hours
+    
+    def to_dict(self):
+        """Convert learning phase to dictionary for API responses"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'phase_type': self.phase_type,
+            'immersion_hours': self.immersion_hours,
+            'target_immersion_hours': self.target_immersion_hours,
+            'progress_percentage': min(100, (self.immersion_hours / self.target_immersion_hours) * 100) if self.phase_type == 'immersion' else 100,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'is_ready_for_output': self.is_ready_for_output()
+        }
+
+class ImmersionSession(db.Model):
+    """Model for tracking individual immersion sessions"""
+    __tablename__ = 'immersion_sessions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content_source_id = db.Column(db.Integer, db.ForeignKey('content_sources.id'), nullable=True)
+    duration_minutes = db.Column(db.Float, nullable=False)  # Duration in minutes
+    session_type = db.Column(db.String(50), nullable=False)  # 'listening', 'reading', 'watching'
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref='immersion_sessions')
+    content_source = db.relationship('ContentSource', backref='immersion_sessions')
+    
+    def to_dict(self):
+        """Convert immersion session to dictionary for API responses"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'content_source_id': self.content_source_id,
+            'duration_minutes': self.duration_minutes,
+            'duration_hours': self.duration_minutes / 60,
+            'session_type': self.session_type,
+            'notes': self.notes,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class ContentBookmark(db.Model):
+    """Model for tracking bookmarked content"""
+    __tablename__ = 'content_bookmarks'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content_id = db.Column(db.Integer, nullable=False)  # ID of the content in the immersion system
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref='content_bookmarks')
+    
+    # Unique constraint to prevent duplicate bookmarks
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'content_id', name='uq_user_content_bookmark'),
+    )
+    
+    def to_dict(self):
+        """Convert bookmark to dictionary for API responses"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'content_id': self.content_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class ContentProgress(db.Model):
+    """Model for tracking user progress through content"""
+    __tablename__ = 'content_progress'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content_id = db.Column(db.Integer, nullable=False)  # ID of the content in the immersion system
+    progress = db.Column(db.Float, default=0.0)  # 0-100 percentage
+    completed = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    user = db.relationship('User', backref='content_progress')
+    
+    # Unique constraint to prevent duplicate progress records
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'content_id', name='uq_user_content_progress'),
+    )
+    
+    def to_dict(self):
+        """Convert progress to dictionary for API responses"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'content_id': self.content_id,
+            'progress': self.progress,
+            'completed': self.completed,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None
+        }

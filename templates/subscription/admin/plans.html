@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Subscription Plans{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Manage Subscription Plans</h3>
+                    <a href="{{ url_for('subscription.admin_create_plan') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Create New Plan
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if plans %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Display Name</th>
+                                    <th>Price</th>
+                                    <th>Interval</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for plan in plans %}
+                                <tr>
+                                    <td>{{ plan.id }}</td>
+                                    <td>{{ plan.name }}</td>
+                                    <td>{{ plan.display_name }}</td>
+                                    <td>${{ "%.2f"|format(plan.price) }}</td>
+                                    <td>{{ plan.interval }}</td>
+                                    <td>
+                                        {% if plan.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('subscription.admin_edit_plan', plan_id=plan.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No subscription plans found.
+                    </div>
+                    
+                    <form action="{{ url_for('subscription.admin_initialize_plans') }}" method="post" class="mt-3">
+                        <button type="submit" class="btn btn-primary">Initialize Default Plans</button>
+                    </form>
+                    {% endif %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Stripe Integration</h5>
+                            <p>Subscription plans are synced with Stripe. When you create or update a plan, the corresponding Stripe product and price will be created or updated.</p>
+                            <p><strong>Note:</strong> Free plans are not synced with Stripe.</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Plan Management</h5>
+                            <ul>
+                                <li>You can create new plans by clicking the "Create New Plan" button.</li>
+                                <li>You can edit existing plans by clicking the "Edit" button next to a plan.</li>
+                                <li>You can deactivate a plan by setting its status to "Inactive" when editing.</li>
+                                <li>You cannot delete plans that have active subscriptions.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

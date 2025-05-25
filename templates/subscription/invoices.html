@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Invoices - ¡Salud!{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Billing History</h3>
+                </div>
+                <div class="card-body">
+                    {% if invoices %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoice_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% if invoice.subscription %}
+                                        {{ invoice.subscription.plan.display_name }} Subscription
+                                        {% else %}
+                                        Payment
+                                        {% endif %}
+                                    </td>
+                                    <td>${{ "%.2f"|format(invoice.amount) }} {{ invoice.currency|upper }}</td>
+                                    <td>
+                                        {% if invoice.status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif invoice.status == 'open' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif invoice.status == 'void' %}
+                                        <span class="badge bg-secondary">Void</span>
+                                        {% elif invoice.status == 'uncollectible' %}
+                                        <span class="badge bg-danger">Failed</span>
+                                        {% else %}
+                                        <span class="badge bg-info">{{ invoice.status|capitalize }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if invoice.invoice_pdf %}
+                                        <a href="{{ invoice.invoice_pdf }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-pdf"></i> Download
+                                        </a>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            <i class="fas fa-file-pdf"></i> N/A
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> You don't have any invoices yet.
+                    </div>
+                    {% endif %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Subscription Details</h5>
+                            {% if current_user.subscription %}
+                            <p><strong>Plan:</strong> {{ current_user.subscription.plan.display_name }}</p>
+                            <p><strong>Status:</strong> 
+                                {% if current_user.subscription.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif current_user.subscription.status == 'canceled' %}
+                                <span class="badge bg-danger">Canceled</span>
+                                {% elif current_user.subscription.status == 'past_due' %}
+                                <span class="badge bg-warning text-dark">Past Due</span>
+                                {% elif current_user.subscription.status == 'trialing' %}
+                                <span class="badge bg-info">Trial</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ current_user.subscription.status|capitalize }}</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Current Period:</strong> {{ current_user.subscription.current_period_start.strftime('%Y-%m-%d') }} to {{ current_user.subscription.current_period_end.strftime('%Y-%m-%d') }}</p>
+                            
+                            {% if current_user.subscription.cancel_at_period_end %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Your subscription will be canceled on {{ current_user.subscription.current_period_end.strftime('%Y-%m-%d') }}.
+                            </div>
+                            {% endif %}
+                            
+                            {% else %}
+                            <p>You don't have an active subscription.</p>
+                            <a href="{{ url_for('subscription.plans') }}" class="btn btn-primary mt-2">View Subscription Plans</a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Payment Methods</h5>
+                            {% if payment_methods %}
+                            <ul class="list-group">
+                                {% for method in payment_methods %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fab fa-cc-{{ method.card_brand|lower }}"></i>
+                                        •••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})
+                                        {% if method.is_default %}
+                                        <span class="badge bg-success ms-2">Default</span>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{{ url_for('subscription.payment_methods') }}" class="btn btn-outline-primary mt-3">Manage Payment Methods</a>
+                            {% else %}
+                            <p>You don't have any saved payment methods.</p>
+                            <a href="{{ url_for('subscription.payment_methods') }}" class="btn btn-outline-primary mt-2">Add Payment Method</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow mt-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Billing FAQs</h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="billingFAQ">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    When am I billed?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#billingFAQ">
+                                <div class="accordion-body">
+                                    You are billed at the start of each billing cycle. For monthly subscriptions, you'll be billed every month on the same date you initially subscribed. For annual subscriptions, you'll be billed once a year on your subscription anniversary.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How do I update my payment method?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#billingFAQ">
+                                <div class="accordion-body">
+                                    You can update your payment method by going to the <a href="{{ url_for('subscription.payment_methods') }}">Payment Methods</a> page. There, you can add a new payment method and set it as your default for future payments.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    How do I cancel my subscription?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#billingFAQ">
+                                <div class="accordion-body">
+                                    You can cancel your subscription by going to the <a href="{{ url_for('subscription.plans') }}">Subscription Plans</a> page and clicking the "Cancel Subscription" button. Your subscription will remain active until the end of your current billing period.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingFour">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    Can I get a refund?
+                                </button>
+                            </h2>
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#billingFAQ">
+                                <div class="accordion-body">
+                                    We offer a 14-day money-back guarantee. If you're not satisfied with your subscription within the first 14 days, please contact our support team for a full refund. After 14 days, refunds are provided at our discretion.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

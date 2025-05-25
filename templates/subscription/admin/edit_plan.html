@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Edit Subscription Plan{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Edit Subscription Plan</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('subscription.admin_edit_plan', plan_id=plan.id) }}" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Plan Name (Internal ID)</label>
+                            <input type="text" class="form-control" id="name" value="{{ plan.name }}" readonly>
+                            <div class="form-text">The internal identifier cannot be changed.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="display_name" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="display_name" name="display_name" value="{{ plan.display_name }}" required>
+                            <div class="form-text">This is the name that will be displayed to users.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ plan.description }}</textarea>
+                            <div class="form-text">A brief description of the plan.</div>
+                        </div>
+                        
+                        {% if plan.name == 'free' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="{{ "%.2f"|format(plan.price) }}" required>
+                                    </div>
+                                    <div class="form-text">The price of the plan. Use 0 for free plans.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interval" class="form-label">Billing Interval</label>
+                                    <select class="form-select" id="interval" name="interval" required>
+                                        <option value="month" {% if plan.interval == 'month' %}selected{% endif %}>Monthly</option>
+                                        <option value="year" {% if plan.interval == 'year' %}selected{% endif %}>Yearly</option>
+                                    </select>
+                                    <div class="form-text">How often the user will be billed.</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" value="{{ "%.2f"|format(plan.price) }}" readonly>
+                                    </div>
+                                    <div class="form-text">The price cannot be changed for existing paid plans. Create a new plan instead.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interval" class="form-label">Billing Interval</label>
+                                    <input type="text" class="form-control" id="interval" value="{{ plan.interval }}" readonly>
+                                    <div class="form-text">The billing interval cannot be changed for existing paid plans.</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="features" class="form-label">Features (JSON)</label>
+                            <textarea class="form-control" id="features" name="features" rows="5">{{ plan.features|tojson(indent=2) }}</textarea>
+                            <div class="form-text">The features included in this plan, in JSON format. Use -1 for unlimited.</div>
+                        </div>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if plan.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active</label>
+                            <div class="form-text">If unchecked, this plan will not be available for new subscriptions.</div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        {% if plan.name != 'free' %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Changes to the display name and features will be reflected for all users with this subscription plan. Price and interval cannot be changed for existing paid plans.
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{{ url_for('subscription.admin_plans') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validate JSON in features field
+        const featuresField = document.getElementById('features');
+        const form = featuresField.closest('form');
+        
+        form.addEventListener('submit', function(event) {
+            try {
+                JSON.parse(featuresField.value);
+            } catch (error) {
+                event.preventDefault();
+                alert('Invalid JSON in features field. Please correct the format.');
+                featuresField.focus();
+            }
+        });
+    });
+</script>
+{% endblock %}

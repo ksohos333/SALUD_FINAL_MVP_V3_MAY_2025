@@ -4,9 +4,17 @@ import datetime
 import openai
 from ai_integration.API_Integration import generate_lesson
 
-# Ensure the lessons directory exists
+# Use in-memory storage for Vercel deployment
+# Check if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+# In-memory storage for lessons when on Vercel
+LESSONS_MEMORY = []
+
+# Local directory for lessons when running locally
 LESSONS_DIR = os.path.join(os.path.dirname(__file__), 'generated')
-os.makedirs(LESSONS_DIR, exist_ok=True)
+if not IS_VERCEL:
+    os.makedirs(LESSONS_DIR, exist_ok=True)
 
 def generate_interactive_lesson(language='Spanish', level='beginner', topic='greetings', task_based=True):
     """
@@ -61,12 +69,16 @@ def generate_interactive_lesson(language='Spanish', level='beginner', topic='gre
             'timestamp': datetime.datetime.now().isoformat()
         }
         
-        # Save the lesson to a file
-        filename = f"{lesson_id}.json"
-        filepath = os.path.join(LESSONS_DIR, filename)
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(lesson, f, ensure_ascii=False, indent=2)
+        if IS_VERCEL:
+            # Store in memory when on Vercel
+            LESSONS_MEMORY.append(lesson)
+        else:
+            # Save the lesson to a file when running locally
+            filename = f"{lesson_id}.json"
+            filepath = os.path.join(LESSONS_DIR, filename)
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(lesson, f, ensure_ascii=False, indent=2)
         
         return lesson
     
@@ -130,12 +142,16 @@ def generate_subject_based_lesson(language='Spanish', level='beginner', subject=
             'timestamp': datetime.datetime.now().isoformat()
         }
         
-        # Save the lesson to a file
-        filename = f"{lesson_id}.json"
-        filepath = os.path.join(LESSONS_DIR, filename)
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(lesson, f, ensure_ascii=False, indent=2)
+        if IS_VERCEL:
+            # Store in memory when on Vercel
+            LESSONS_MEMORY.append(lesson)
+        else:
+            # Save the lesson to a file when running locally
+            filename = f"{lesson_id}.json"
+            filepath = os.path.join(LESSONS_DIR, filename)
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(lesson, f, ensure_ascii=False, indent=2)
         
         return lesson
     
@@ -156,23 +172,72 @@ def get_recent_lessons(limit=10):
     Returns:
         list: List of lessons
     """
-    lessons = []
-    
-    # Check if the directory exists
-    if not os.path.exists(LESSONS_DIR):
+    if IS_VERCEL:
+        # Return from in-memory storage when on Vercel
+        # Sort by timestamp (newest first) and limit
+        sorted_lessons = sorted(
+            LESSONS_MEMORY, 
+            key=lambda x: x.get('timestamp', ''), 
+            reverse=True
+        )
+        return sorted_lessons[:limit]
+    else:
+        # Return from file system when running locally
+        lessons = []
+        
+        # Check if the directory exists
+        if not os.path.exists(LESSONS_DIR):
+            return lessons
+        
+        # Get all JSON files in the directory
+        files = [f for f in os.listdir(LESSONS_DIR) if f.endswith('.json')]
+        
+        # Sort files by name (which is based on timestamp)
+        files.sort(reverse=True)
+        
+        # Load the lessons
+        for filename in files[:limit]:
+            filepath = os.path.join(LESSONS_DIR, filename)
+            with open(filepath, 'r', encoding='utf-8') as f:
+                lesson = json.load(f)
+                lessons.append(lesson)
+        
         return lessons
+
+def get_lesson_by_id(lesson_id):
+    """
+    Get a specific lesson by its ID.
     
-    # Get all JSON files in the directory
-    files = [f for f in os.listdir(LESSONS_DIR) if f.endswith('.json')]
-    
-    # Sort files by name (which is based on timestamp)
-    files.sort(reverse=True)
-    
-    # Load the lessons
-    for filename in files[:limit]:
-        filepath = os.path.join(LESSONS_DIR, filename)
-        with open(filepath, 'r', encoding='utf-8') as f:
-            lesson = json.load(f)
-            lessons.append(lesson)
-    
-    return lessons
+    Args:
+        lesson_id (str): The ID of the lesson to retrieve
+        
+    Returns:
+        dict: The lesson object or None if not found
+    """
+    if IS_VERCEL:
+        # Find in memory when on Vercel
+        for lesson in LESSONS_MEMORY:
+            if lesson.get('id') == lesson_id:
+                return lesson
+        return None
+    else:
+        # Try to find in file system when running locally
+        if not os.path.exists(LESSONS_DIR):
+            return None
+        
+        # First try direct filename match
+        filepath = os.path.join(LESSONS_DIR, f"{lesson_id}.json")
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        
+        # If not found, search through all files
+        for filename in os.listdir(LESSONS_DIR):
+            if filename.endswith('.json'):
+                filepath = os.path.join(LESSONS_DIR, filename)
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    lesson = json.load(f)
+                    if lesson.get('id') == lesson_id:
+                        return lesson
+        
+        return None

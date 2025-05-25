@@ -1,0 +1,54 @@
+{
+  "projectName": "Salud Language Learning",
+  "framework": "Next.js",
+  "components": [
+    {
+      "name": "Header",
+      "path": "./components/Header.js",
+      "size": 1287
+    },
+    {
+      "name": "Footer",
+      "path": "./components/Footer.js",
+      "size": 2428
+    },
+    {
+      "name": "Layout",
+      "path": "./components/Layout.js",
+      "size": 314
+    },
+    {
+      "name": "FeatureCard",
+      "path": "./pages/index.js",
+      "size": 1510
+    },
+    {
+      "name": "LessonCard",
+      "path": "./pages/lessons/index.js",
+      "size": 3121
+    },
+    {
+      "name": "JournalEntry",
+      "path": "./pages/journal/index.js",
+      "size": 7179
+    }
+  ],
+  "pages": [
+    {
+      "name": "Home",
+      "path": "./pages/index.js",
+      "size": 1510
+    },
+    {
+      "name": "Lessons",
+      "path": "./pages/lessons/index.js",
+      "size": 3121
+    },
+    {
+      "name": "Journal",
+      "path": "./pages/journal/index.js",
+      "size": 7179
+    }
+  ],
+  "timestamp": "2025-03-09T16:20:51.094Z"
+}

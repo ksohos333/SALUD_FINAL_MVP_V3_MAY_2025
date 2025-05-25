@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Create Subscription Plan{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Create New Subscription Plan</h3>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('subscription.admin_create_plan') }}" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Plan Name (Internal ID)</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="form-text">This is the internal identifier for the plan. Use lowercase letters, numbers, and underscores only (e.g., "premium_monthly").</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="display_name" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="display_name" name="display_name" required>
+                            <div class="form-text">This is the name that will be displayed to users (e.g., "Premium Monthly").</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="form-text">A brief description of the plan.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="form-text">The price of the plan. Use 0 for free plans.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interval" class="form-label">Billing Interval</label>
+                                    <select class="form-select" id="interval" name="interval" required>
+                                        <option value="month">Monthly</option>
+                                        <option value="year">Yearly</option>
+                                    </select>
+                                    <div class="form-text">How often the user will be billed.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="features" class="form-label">Features (JSON)</label>
+                            <textarea class="form-control" id="features" name="features" rows="5">{"word_limit": 20, "ai_lessons": true, "advanced_grammar": false, "enhanced_vocabulary": false, "audio_generation": false, "offline_access": false}</textarea>
+                            <div class="form-text">The features included in this plan, in JSON format. Use -1 for unlimited.</div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Note:</strong> If this is a paid plan (price > 0), a corresponding product and price will be created in Stripe.
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Plan</button>
+                            <a href="{{ url_for('subscription.admin_plans') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validate JSON in features field
+        const featuresField = document.getElementById('features');
+        const form = featuresField.closest('form');
+        
+        form.addEventListener('submit', function(event) {
+            try {
+                JSON.parse(featuresField.value);
+            } catch (error) {
+                event.preventDefault();
+                alert('Invalid JSON in features field. Please correct the format.');
+                featuresField.focus();
+            }
+        });
+        
+        // Update features template based on plan type
+        const priceField = document.getElementById('price');
+        
+        priceField.addEventListener('change', function() {
+            const price = parseFloat(this.value);
+            
+            if (price === 0) {
+                // Free plan template
+                featuresField.value = JSON.stringify({
+                    word_limit: 20,
+                    ai_lessons: true,
+                    advanced_grammar: false,
+                    enhanced_vocabulary: false,
+                    audio_generation: false,
+                    offline_access: false
+                }, null, 2);
+            } else {
+                // Paid plan template
+                featuresField.value = JSON.stringify({
+                    word_limit: -1, // Unlimited
+                    ai_lessons: true,
+                    advanced_grammar: true,
+                    enhanced_vocabulary: true,
+                    audio_generation: true,
+                    offline_access: true
+                }, null, 2);
+            }
+        });
+    });
+</script>
+{% endblock %}

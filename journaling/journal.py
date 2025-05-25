@@ -4,13 +4,21 @@ import datetime
 import openai
 from ai_integration.API_Integration import generate_lesson
 
-# Ensure the journal entries directory exists
+# Use in-memory storage for Vercel deployment
+# Check if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+# In-memory storage for journal entries when on Vercel
+JOURNAL_ENTRIES = []
+
+# Local directory for journal entries when running locally
 JOURNAL_DIR = os.path.join(os.path.dirname(__file__), 'entries')
-os.makedirs(JOURNAL_DIR, exist_ok=True)
+if not IS_VERCEL:
+    os.makedirs(JOURNAL_DIR, exist_ok=True)
 
 def create_journal_entry(content, language='Spanish'):
     """
-    Create a new journal entry and save it to a JSON file.
+    Create a new journal entry and save it to a JSON file or in-memory storage.
     
     Args:
         content (str): The content of the journal entry
@@ -34,12 +42,16 @@ def create_journal_entry(content, language='Spanish'):
         'feedback': feedback
     }
     
-    # Save the entry to a file
-    filename = f"{entry_id}.json"
-    filepath = os.path.join(JOURNAL_DIR, filename)
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(entry, f, ensure_ascii=False, indent=2)
+    if IS_VERCEL:
+        # Store in memory when on Vercel
+        JOURNAL_ENTRIES.append(entry)
+    else:
+        # Save the entry to a file when running locally
+        filename = f"{entry_id}.json"
+        filepath = os.path.join(JOURNAL_DIR, filename)
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(entry, f, ensure_ascii=False, indent=2)
     
     return entry
 
@@ -53,26 +65,37 @@ def get_journal_entries(limit=10):
     Returns:
         list: List of journal entries
     """
-    entries = []
-    
-    # Check if the directory exists
-    if not os.path.exists(JOURNAL_DIR):
+    if IS_VERCEL:
+        # Return from in-memory storage when on Vercel
+        # Sort by timestamp (newest first) and limit
+        sorted_entries = sorted(
+            JOURNAL_ENTRIES, 
+            key=lambda x: x.get('timestamp', ''), 
+            reverse=True
+        )
+        return sorted_entries[:limit]
+    else:
+        # Return from file system when running locally
+        entries = []
+        
+        # Check if the directory exists
+        if not os.path.exists(JOURNAL_DIR):
+            return entries
+        
+        # Get all JSON files in the directory
+        files = [f for f in os.listdir(JOURNAL_DIR) if f.endswith('.json')]
+        
+        # Sort files by name (which is based on timestamp)
+        files.sort(reverse=True)
+        
+        # Load the entries
+        for filename in files[:limit]:
+            filepath = os.path.join(JOURNAL_DIR, filename)
+            with open(filepath, 'r', encoding='utf-8') as f:
+                entry = json.load(f)
+                entries.append(entry)
+        
         return entries
-    
-    # Get all JSON files in the directory
-    files = [f for f in os.listdir(JOURNAL_DIR) if f.endswith('.json')]
-    
-    # Sort files by name (which is based on timestamp)
-    files.sort(reverse=True)
-    
-    # Load the entries
-    for filename in files[:limit]:
-        filepath = os.path.join(JOURNAL_DIR, filename)
-        with open(filepath, 'r', encoding='utf-8') as f:
-            entry = json.load(f)
-            entries.append(entry)
-    
-    return entries
 
 def get_ai_feedback(content, language):
     """

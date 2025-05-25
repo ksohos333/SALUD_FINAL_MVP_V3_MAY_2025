@@ -103,6 +103,11 @@ def register():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        # Print request information for debugging
+        print(f"Login request received. Content-Type: {request.headers.get('Content-Type')}")
+        print(f"Request form data: {request.form}")
+        print(f"Request JSON data: {request.get_json(silent=True)}")
+        
         if request.is_json:
             data = request.get_json()
             email_or_username = data.get('email_or_username')

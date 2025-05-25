@@ -4,20 +4,35 @@
 
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // Make sure Bootstrap is loaded
+    if (typeof bootstrap !== 'undefined') {
+        try {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
 
-    // Initialize popovers
-    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    popoverTriggerList.map(function(popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
+            // Initialize popovers
+            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.map(function(popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        } catch (error) {
+            console.error('Error initializing Bootstrap components:', error);
+        }
+    } else {
+        console.warn('Bootstrap JavaScript is not loaded. Some features may not work properly.');
+    }
     
     // Initialize theme toggle
     setupThemeToggle();
+    
+    // Initialize amber filter
+    setupAmberFilter();
+    
+    // Add console log to check if the script is running
+    console.log('¡Salud! JavaScript initialized');
 
     // API Endpoints
     const API_ENDPOINTS = {
@@ -573,51 +588,166 @@ function setupThemeToggle() {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Set initial theme
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+    // Set initial theme to orange by default
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
     } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
+        document.documentElement.setAttribute('data-theme', 'orange');
+        localStorage.setItem('theme', 'orange');
     }
     
-    // Add theme toggle button to navbar if it doesn't exist
-    const navbar = document.querySelector('.navbar-nav');
-    if (navbar && !document.getElementById('theme-toggle')) {
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        const themeIcon = currentTheme === 'dark' ? 'sun' : 'moon';
-        
-        const themeToggleItem = document.createElement('li');
-        themeToggleItem.className = 'nav-item ms-2';
-        themeToggleItem.innerHTML = `
-            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
-                <i class="fas fa-${themeIcon}"></i>
-            </button>
-        `;
-        
-        navbar.appendChild(themeToggleItem);
+    // Find the existing theme toggle button
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        // Update the icon based on the current theme
+        updateThemeIcon();
         
         // Add event listener to theme toggle button
-        document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        console.log('Theme toggle button initialized');
+    } else {
+        console.warn('Theme toggle button not found in the DOM');
     }
 }
 
 /**
- * Toggle between light and dark themes
+ * Update theme toggle icon based on current theme
+ */
+function updateThemeIcon() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    if (!themeToggle) return;
+    
+    let themeIcon;
+    switch (currentTheme) {
+        case 'dark':
+            themeIcon = 'sun';
+            break;
+        case 'orange':
+            themeIcon = 'adjust';
+            break;
+        default: // light
+            themeIcon = 'moon';
+    }
+    
+    themeToggle.innerHTML = `<i class="fas fa-${themeIcon}"></i>`;
+    
+    // Log the current theme for debugging
+    console.log('Current theme:', currentTheme);
+}
+
+/**
+ * Toggle between light, dark, and orange themes
  */
 function toggleTheme() {
     const currentTheme = localStorage.getItem('theme') || 'light';
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    const themeIcon = newTheme === 'dark' ? 'sun' : 'moon';
+    let newTheme;
+    
+    // Cycle through themes: light -> dark -> orange -> light
+    switch (currentTheme) {
+        case 'light':
+            newTheme = 'dark';
+            break;
+        case 'dark':
+            newTheme = 'orange';
+            break;
+        case 'orange':
+            newTheme = 'light';
+            break;
+        default:
+            newTheme = 'light';
+    }
     
     // Update theme
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     
     // Update button icon
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.innerHTML = `<i class="fas fa-${themeIcon}"></i>`;
+    updateThemeIcon();
+}
+
+/**
+ * Setup amber screen filter for blue light protection
+ */
+function setupAmberFilter() {
+    // Check for saved amber filter preference
+    const amberFilterEnabled = localStorage.getItem('amberFilter') === 'true';
+    
+    // Create amber filter element if it doesn't exist
+    if (!document.getElementById('amber-filter')) {
+        const amberFilter = document.createElement('div');
+        amberFilter.id = 'amber-filter';
+        amberFilter.className = 'amber-filter';
+        amberFilter.style.opacity = '0';
+        document.body.appendChild(amberFilter);
     }
+    
+    // Find the existing amber filter toggle button
+    const amberToggle = document.getElementById('amber-filter-toggle');
+    if (amberToggle) {
+        // Add event listener to amber filter toggle button
+        amberToggle.addEventListener('click', toggleAmberFilter);
+        
+        // Set initial state
+        if (amberFilterEnabled) {
+            enableAmberFilter();
+        }
+        
+        console.log('Amber filter button initialized');
+    } else {
+        console.warn('Amber filter button not found in the DOM');
+    }
+}
+
+/**
+ * Toggle amber screen filter
+ */
+function toggleAmberFilter() {
+    const amberFilterEnabled = localStorage.getItem('amberFilter') === 'true';
+    
+    if (amberFilterEnabled) {
+        disableAmberFilter();
+    } else {
+        enableAmberFilter();
+    }
+}
+
+/**
+ * Enable amber screen filter
+ */
+function enableAmberFilter() {
+    const amberFilter = document.getElementById('amber-filter');
+    const amberToggle = document.getElementById('amber-filter-toggle');
+    
+    if (amberFilter) {
+        amberFilter.style.opacity = '1';
+    }
+    
+    if (amberToggle) {
+        amberToggle.classList.add('active');
+        amberToggle.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+    
+    localStorage.setItem('amberFilter', 'true');
+}
+
+/**
+ * Disable amber screen filter
+ */
+function disableAmberFilter() {
+    const amberFilter = document.getElementById('amber-filter');
+    const amberToggle = document.getElementById('amber-filter-toggle');
+    
+    if (amberFilter) {
+        amberFilter.style.opacity = '0';
+    }
+    
+    if (amberToggle) {
+        amberToggle.classList.remove('active');
+        amberToggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    }
+    
+    localStorage.setItem('amberFilter', 'false');
 }

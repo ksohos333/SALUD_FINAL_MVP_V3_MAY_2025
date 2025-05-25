@@ -1,0 +1,20 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyB06qRMZVIu2hSfP_FPxidsI7orcxE5OXE",
+  authDomain: "ai-language-learning-app.firebaseapp.com",
+  projectId: "ai-language-learning-app",
+  storageBucket: "ai-language-learning-app.firebasestorage.app",
+  messagingSenderId: "68896485567",
+  appId: "1:68896485567:web:7d86a141a17f1e38b1560a",
+  measurementId: "G-K36EYL36ZL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export { db, collection, doc, setDoc };

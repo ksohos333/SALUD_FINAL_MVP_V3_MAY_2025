@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - {{ plan.display_name }} Plan{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header {% if plan.name == 'premium' %}bg-primary text-white{% elif plan.name == 'annual' %}bg-warning text-dark{% else %}bg-light{% endif %}">
+                    <h3 class="mb-0">Subscribe to {{ plan.display_name }} Plan</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Plan Details</h5>
+                            <p><strong>Price:</strong> ${{ "%.2f"|format(plan.price) }}/{{ plan.interval }}</p>
+                            <p><strong>Billing:</strong> You will be charged ${{ "%.2f"|format(plan.price) }} {% if plan.interval == 'month' %}monthly{% else %}annually{% endif %}.</p>
+                            <p><strong>Cancel anytime:</strong> You can cancel your subscription at any time.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>What You Get</h5>
+                            <ul class="list-unstyled">
+                                {% if plan.name == 'premium' %}
+                                <li><i class="fas fa-check text-success me-2"></i> Unlimited saved words</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Auto-generated audio</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Full sentence translations</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Advanced statistics</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Offline access</li>
+                                {% elif plan.name == 'annual' %}
+                                <li><i class="fas fa-check text-success me-2"></i> All Premium features</li>
+                                <li><i class="fas fa-check text-success me-2"></i> 20% discount</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Early access to new features</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div id="payment-form">
+                        <h5 class="mb-3">Payment Information</h5>
+                        
+                        {% if payment_methods %}
+                        <div class="mb-4">
+                            <h6>Saved Payment Methods</h6>
+                            <div class="list-group mb-3">
+                                {% for method in payment_methods %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_{{ method.id }}" value="{{ method.stripe_payment_method_id }}" {% if method.is_default %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_{{ method.id }}">
+                                            <i class="fab fa-cc-{{ method.card_brand|lower }}"></i> •••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_new" value="new" {% if not payment_methods %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_new">
+                                            <i class="fas fa-plus-circle"></i> Use a new payment method
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div id="new-payment-method" {% if payment_methods %}class="d-none"{% endif %}>
+                            <div class="mb-3">
+                                <label for="card-element" class="form-label">Credit or debit card</label>
+                                <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;"></div>
+                                <div id="card-errors" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms-checkbox" required>
+                            <label class="form-check-label" for="terms-checkbox">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="submit-button" class="btn {% if plan.name == 'premium' %}btn-primary{% elif plan.name == 'annual' %}btn-warning{% else %}btn-success{% endif %} btn-lg">
+                                Subscribe Now
+                            </button>
+                            <a href="{{ url_for('subscription.plans') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-success" class="d-none">
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                            <h3>Payment Successful!</h3>
+                            <p class="lead">Your subscription has been activated.</p>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">Go to Dashboard</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-processing" class="d-none">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h3>Processing Payment...</h3>
+                            <p>Please wait while we process your payment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Subscription Terms</h6>
+                <p>By subscribing to ¡Salud!, you agree to the following terms:</p>
+                <ul>
+                    <li>Your subscription will automatically renew at the end of each billing period unless canceled.</li>
+                    <li>You can cancel your subscription at any time. If you cancel, you'll continue to have access to premium features until the end of your current billing period.</li>
+                    <li>We reserve the right to change subscription prices with 30 days notice.</li>
+                </ul>
+                
+                <h6>2. Payment Terms</h6>
+                <p>By providing your payment information, you agree to the following:</p>
+                <ul>
+                    <li>You authorize us to charge your payment method for the subscription plan you selected.</li>
+                    <li>If your payment fails, we may retry charging your payment method.</li>
+                    <li>You are responsible for keeping your payment information up to date.</li>
+                </ul>
+                
+                <h6>3. Refund Policy</h6>
+                <p>We offer a 14-day money-back guarantee. If you're not satisfied with your subscription within the first 14 days, contact our support team for a full refund.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Payment Information</h6>
+                <p>We use Stripe to process payments. Your payment information is securely handled by Stripe and is not stored on our servers. For more information, please see <a href="https://stripe.com/privacy" target="_blank">Stripe's Privacy Policy</a>.</p>
+                
+                <h6>2. Subscription Data</h6>
+                <p>We collect and store information related to your subscription, including:</p>
+                <ul>
+                    <li>Subscription plan and status</li>
+                    <li>Billing dates</li>
+                    <li>Payment history</li>
+                </ul>
+                <p>This information is used to manage your subscription and provide customer support.</p>
+                
+                <h6>3. Data Security</h6>
+                <p>We take the security of your data seriously and implement appropriate measures to protect it.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Stripe
+        const stripe = Stripe('{{ stripe_public_key }}');
+        const elements = stripe.elements();
+        
+        // Create card element
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle validation errors
+        cardElement.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // Handle payment method selection
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        const newPaymentMethodDiv = document.getElementById('new-payment-method');
+        
+        if (paymentMethodRadios.length > 0) {
+            paymentMethodRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'new') {
+                        newPaymentMethodDiv.classList.remove('d-none');
+                    } else {
+                        newPaymentMethodDiv.classList.add('d-none');
+                    }
+                });
+            });
+        }
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        
+        submitButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            
+            // Check terms checkbox
+            if (!termsCheckbox.checked) {
+                alert('Please agree to the Terms and Conditions and Privacy Policy');
+                return;
+            }
+            
+            // Disable the submit button to prevent multiple clicks
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Show processing state
+            document.getElementById('payment-form').classList.add('d-none');
+            document.getElementById('payment-processing').classList.remove('d-none');
+            
+            try {
+                let paymentMethodId;
+                
+                // Check if using existing payment method
+                const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (selectedPaymentMethod && selectedPaymentMethod.value !== 'new') {
+                    paymentMethodId = selectedPaymentMethod.value;
+                } else {
+                    // Create a new payment method
+                    const result = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement
+                    });
+                    
+                    if (result.error) {
+                        throw result.error;
+                    }
+                    
+                    paymentMethodId = result.paymentMethod.id;
+                }
+                
+                // Create subscription
+                const response = await fetch('{{ url_for("subscription.create") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+{% extends "base.html" %}
+
+{% block title %}Checkout - {{ plan.display_name }} Plan{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header {% if plan.name == 'premium' %}bg-primary text-white{% elif plan.name == 'annual' %}bg-warning text-dark{% else %}bg-light{% endif %}">
+                    <h3 class="mb-0">Subscribe to {{ plan.display_name }} Plan</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Plan Details</h5>
+                            <p><strong>Price:</strong> ${{ "%.2f"|format(plan.price) }}/{{ plan.interval }}</p>
+                            <p><strong>Billing:</strong> You will be charged ${{ "%.2f"|format(plan.price) }} {% if plan.interval == 'month' %}monthly{% else %}annually{% endif %}.</p>
+                            <p><strong>Cancel anytime:</strong> You can cancel your subscription at any time.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>What You Get</h5>
+                            <ul class="list-unstyled">
+                                {% if plan.name == 'premium' %}
+                                <li><i class="fas fa-check text-success me-2"></i> Unlimited saved words</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Auto-generated audio</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Full sentence translations</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Advanced statistics</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Offline access</li>
+                                {% elif plan.name == 'annual' %}
+                                <li><i class="fas fa-check text-success me-2"></i> All Premium features</li>
+                                <li><i class="fas fa-check text-success me-2"></i> 20% discount</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Early access to new features</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div id="payment-form">
+                        <h5 class="mb-3">Payment Information</h5>
+                        
+                        {% if payment_methods %}
+                        <div class="mb-4">
+                            <h6>Saved Payment Methods</h6>
+                            <div class="list-group mb-3">
+                                {% for method in payment_methods %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_{{ method.id }}" value="{{ method.stripe_payment_method_id }}" {% if method.is_default %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_{{ method.id }}">
+                                            <i class="fab fa-cc-{{ method.card_brand|lower }}"></i> •••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_new" value="new" {% if not payment_methods %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_new">
+                                            <i class="fas fa-plus-circle"></i> Use a new payment method
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div id="new-payment-method" {% if payment_methods %}class="d-none"{% endif %}>
+                            <div class="mb-3">
+                                <label for="card-element" class="form-label">Credit or debit card</label>
+                                <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;"></div>
+                                <div id="card-errors" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms-checkbox" required>
+                            <label class="form-check-label" for="terms-checkbox">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="submit-button" class="btn {% if plan.name == 'premium' %}btn-primary{% elif plan.name == 'annual' %}btn-warning{% else %}btn-success{% endif %} btn-lg">
+                                Subscribe Now
+                            </button>
+                            <a href="{{ url_for('subscription.plans') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-success" class="d-none">
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                            <h3>Payment Successful!</h3>
+                            <p class="lead">Your subscription has been activated.</p>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">Go to Dashboard</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-processing" class="d-none">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h3>Processing Payment...</h3>
+                            <p>Please wait while we process your payment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Subscription Terms</h6>
+                <p>By subscribing to ¡Salud!, you agree to the following terms:</p>
+                <ul>
+                    <li>Your subscription will automatically renew at the end of each billing period unless canceled.</li>
+                    <li>You can cancel your subscription at any time. If you cancel, you'll continue to have access to premium features until the end of your current billing period.</li>
+                    <li>We reserve the right to change subscription prices with 30 days notice.</li>
+                </ul>
+                
+                <h6>2. Payment Terms</h6>
+                <p>By providing your payment information, you agree to the following:</p>
+                <ul>
+                    <li>You authorize us to charge your payment method for the subscription plan you selected.</li>
+                    <li>If your payment fails, we may retry charging your payment method.</li>
+                    <li>You are responsible for keeping your payment information up to date.</li>
+                </ul>
+                
+                <h6>3. Refund Policy</h6>
+                <p>We offer a 14-day money-back guarantee. If you're not satisfied with your subscription within the first 14 days, contact our support team for a full refund.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Payment Information</h6>
+                <p>We use Stripe to process payments. Your payment information is securely handled by Stripe and is not stored on our servers. For more information, please see <a href="https://stripe.com/privacy" target="_blank">Stripe's Privacy Policy</a>.</p>
+                
+                <h6>2. Subscription Data</h6>
+                <p>We collect and store information related to your subscription, including:</p>
+                <ul>
+                    <li>Subscription plan and status</li>
+                    <li>Billing dates</li>
+                    <li>Payment history</li>
+                </ul>
+                <p>This information is used to manage your subscription and provide customer support.</p>
+                
+                <h6>3. Data Security</h6>
+                <p>We take the security of your data seriously and implement appropriate measures to protect it.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Stripe
+        const stripe = Stripe('{{ stripe_public_key }}');
+        const elements = stripe.elements();
+        
+        // Create card element
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle validation errors
+        cardElement.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // Handle payment method selection
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        const newPaymentMethodDiv = document.getElementById('new-payment-method');
+        
+        if (paymentMethodRadios.length > 0) {
+            paymentMethodRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'new') {
+                        newPaymentMethodDiv.classList.remove('d-none');
+                    } else {
+                        newPaymentMethodDiv.classList.add('d-none');
+                    }
+                });
+            });
+        }
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        
+        submitButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            
+            // Check terms checkbox
+            if (!termsCheckbox.checked) {
+                alert('Please agree to the Terms and Conditions and Privacy Policy');
+                return;
+            }
+            
+            // Disable the submit button to prevent multiple clicks
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Show processing state
+            document.getElementById('payment-form').classList.add('d-none');
+            document.getElementById('payment-processing').classList.remove('d-none');
+            
+            try {
+                let paymentMethodId;
+                
+                // Check if using existing payment method
+                const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (selectedPaymentMethod && selectedPaymentMethod.value !== 'new') {
+                    paymentMethodId = selectedPaymentMethod.value;
+                } else {
+                    // Create a new payment method
+                    const result = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement
+                    });
+                    
+                    if (result.error) {
+                        throw result.error;
+                    }
+                    
+                    paymentMethodId = result.paymentMethod.id;
+                }
+                
+                // Create subscription
+                const response = await fetch('{{ url_for("subscription.create") }}', {
+                    method: 'POST',
+{% extends "base.html" %}
+
+{% block title %}Checkout - {{ plan.display_name }} Plan{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header {% if plan.name == 'premium' %}bg-primary text-white{% elif plan.name == 'annual' %}bg-warning text-dark{% else %}bg-light{% endif %}">
+                    <h3 class="mb-0">Subscribe to {{ plan.display_name }} Plan</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Plan Details</h5>
+                            <p><strong>Price:</strong> ${{ "%.2f"|format(plan.price) }}/{{ plan.interval }}</p>
+                            <p><strong>Billing:</strong> You will be charged ${{ "%.2f"|format(plan.price) }} {% if plan.interval == 'month' %}monthly{% else %}annually{% endif %}.</p>
+                            <p><strong>Cancel anytime:</strong> You can cancel your subscription at any time.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>What You Get</h5>
+                            <ul class="list-unstyled">
+                                {% if plan.name == 'premium' %}
+                                <li><i class="fas fa-check text-success me-2"></i> Unlimited saved words</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Auto-generated audio</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Full sentence translations</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Advanced statistics</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Offline access</li>
+                                {% elif plan.name == 'annual' %}
+                                <li><i class="fas fa-check text-success me-2"></i> All Premium features</li>
+                                <li><i class="fas fa-check text-success me-2"></i> 20% discount</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Early access to new features</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div id="payment-form">
+                        <h5 class="mb-3">Payment Information</h5>
+                        
+                        {% if payment_methods %}
+                        <div class="mb-4">
+                            <h6>Saved Payment Methods</h6>
+                            <div class="list-group mb-3">
+                                {% for method in payment_methods %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_{{ method.id }}" value="{{ method.stripe_payment_method_id }}" {% if method.is_default %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_{{ method.id }}">
+                                            <i class="fab fa-cc-{{ method.card_brand|lower }}"></i> •••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                <div class="list-group-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="payment_method" id="payment_method_new" value="new" {% if not payment_methods %}checked{% endif %}>
+                                        <label class="form-check-label" for="payment_method_new">
+                                            <i class="fas fa-plus-circle"></i> Use a new payment method
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div id="new-payment-method" {% if payment_methods %}class="d-none"{% endif %}>
+                            <div class="mb-3">
+                                <label for="card-element" class="form-label">Credit or debit card</label>
+                                <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;"></div>
+                                <div id="card-errors" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms-checkbox" required>
+                            <label class="form-check-label" for="terms-checkbox">
+                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="submit-button" class="btn {% if plan.name == 'premium' %}btn-primary{% elif plan.name == 'annual' %}btn-warning{% else %}btn-success{% endif %} btn-lg">
+                                Subscribe Now
+                            </button>
+                            <a href="{{ url_for('subscription.plans') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-success" class="d-none">
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                            <h3>Payment Successful!</h3>
+                            <p class="lead">Your subscription has been activated.</p>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">Go to Dashboard</a>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-processing" class="d-none">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h3>Processing Payment...</h3>
+                            <p>Please wait while we process your payment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Subscription Terms</h6>
+                <p>By subscribing to ¡Salud!, you agree to the following terms:</p>
+                <ul>
+                    <li>Your subscription will automatically renew at the end of each billing period unless canceled.</li>
+                    <li>You can cancel your subscription at any time. If you cancel, you'll continue to have access to premium features until the end of your current billing period.</li>
+                    <li>We reserve the right to change subscription prices with 30 days notice.</li>
+                </ul>
+                
+                <h6>2. Payment Terms</h6>
+                <p>By providing your payment information, you agree to the following:</p>
+                <ul>
+                    <li>You authorize us to charge your payment method for the subscription plan you selected.</li>
+                    <li>If your payment fails, we may retry charging your payment method.</li>
+                    <li>You are responsible for keeping your payment information up to date.</li>
+                </ul>
+                
+                <h6>3. Refund Policy</h6>
+                <p>We offer a 14-day money-back guarantee. If you're not satisfied with your subscription within the first 14 days, contact our support team for a full refund.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Payment Information</h6>
+                <p>We use Stripe to process payments. Your payment information is securely handled by Stripe and is not stored on our servers. For more information, please see <a href="https://stripe.com/privacy" target="_blank">Stripe's Privacy Policy</a>.</p>
+                
+                <h6>2. Subscription Data</h6>
+                <p>We collect and store information related to your subscription, including:</p>
+                <ul>
+                    <li>Subscription plan and status</li>
+                    <li>Billing dates</li>
+                    <li>Payment history</li>
+                </ul>
+                <p>This information is used to manage your subscription and provide customer support.</p>
+                
+                <h6>3. Data Security</h6>
+                <p>We take the security of your data seriously and implement appropriate measures to protect it.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Stripe
+        const stripe = Stripe('{{ stripe_public_key }}');
+        const elements = stripe.elements();
+        
+        // Create card element
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle validation errors
+        cardElement.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // Handle payment method selection
+        const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        const newPaymentMethodDiv = document.getElementById('new-payment-method');
+        
+        if (paymentMethodRadios.length > 0) {
+            paymentMethodRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'new') {
+                        newPaymentMethodDiv.classList.remove('d-none');
+                    } else {
+                        newPaymentMethodDiv.classList.add('d-none');
+                    }
+                });
+            });
+        }
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        
+        submitButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            
+            // Check terms checkbox
+            if (!termsCheckbox.checked) {
+                alert('Please agree to the Terms and Conditions and Privacy Policy');
+                return;
+            }
+            
+            // Disable the submit button to prevent multiple clicks
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Show processing state
+            document.getElementById('payment-form').classList.add('d-none');
+            document.getElementById('payment-processing').classList.remove('d-none');
+            
+            try {
+                let paymentMethodId;
+                
+                // Check if using existing payment method
+                const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (selectedPaymentMethod && selectedPaymentMethod.value !== 'new') {
+                    paymentMethodId = selectedPaymentMethod.value;
+                } else {
+                    // Create a new payment method
+                    const result = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement
+                    });
+                    

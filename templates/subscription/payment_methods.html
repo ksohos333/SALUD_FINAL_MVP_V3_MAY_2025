@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Methods - ¡Salud!{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Payment Methods</h3>
+                </div>
+                <div class="card-body">
+                    {% if payment_methods %}
+                    <h5 class="mb-3">Your Saved Payment Methods</h5>
+                    <div class="list-group mb-4">
+                        {% for method in payment_methods %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fab fa-cc-{{ method.card_brand|lower }} fa-2x me-2"></i>
+                                <span>•••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})</span>
+                                {% if method.is_default %}
+                                <span class="badge bg-success ms-2">Default</span>
+                                {% endif %}
+                            </div>
+                            <div class="btn-group">
+                                {% if not method.is_default %}
+                                <form action="{{ url_for('subscription.set_default_payment_method', payment_method_id=method.id) }}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary me-2">Set as Default</button>
+                                </form>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#removeModal{{ method.id }}">Remove</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Remove Payment Method Modal -->
+                        <div class="modal fade" id="removeModal{{ method.id }}" tabindex="-1" aria-labelledby="removeModalLabel{{ method.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="removeModalLabel{{ method.id }}">Remove Payment Method</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to remove this payment method?</p>
+                                        <p><i class="fab fa-cc-{{ method.card_brand|lower }}"></i> •••• {{ method.card_last4 }} (Expires {{ method.card_exp_month }}/{{ method.card_exp_year }})</p>
+                                        {% if method.is_default %}
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle"></i> This is your default payment method. Removing it may affect your active subscriptions.
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('subscription.remove_payment_method', payment_method_id=method.id) }}" method="post">
+                                            <button type="submit" class="btn btn-danger">Remove</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle"></i> You don't have any saved payment methods yet.
+                    </div>
+                    {% endif %}
+                    
+                    <h5 class="mb-3">Add a New Payment Method</h5>
+                    <div id="payment-form">
+                        <div class="mb-3">
+                            <label for="card-element" class="form-label">Credit or debit card</label>
+                            <div id="card-element" class="form-control" style="height: 40px; padding-top: 10px;"></div>
+                            <div id="card-errors" class="invalid-feedback d-block"></div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="set-default-checkbox">
+                            <label class="form-check-label" for="set-default-checkbox">
+                                Set as default payment method
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="submit-button" class="btn btn-primary">Add Payment Method</button>
+                        </div>
+                    </div>
+                    
+                    <div id="payment-success" class="d-none">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Payment method added successfully!
+                        </div>
+                    </div>
+                    
+                    <div id="payment-processing" class="d-none">
+                        <div class="d-flex justify-content-center py-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid">
+                        <a href="{{ url_for('subscription.plans') }}" class="btn btn-outline-secondary">Back to Subscription Plans</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Stripe
+        const stripe = Stripe('{{ stripe_public_key }}');
+        const elements = stripe.elements();
+        
+        // Create card element
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle validation errors
+        cardElement.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const setDefaultCheckbox = document.getElementById('set-default-checkbox');
+        
+        submitButton.addEventListener('click', async function(event) {
+            event.preventDefault();
+            
+            // Disable the submit button to prevent multiple clicks
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Show processing state
+            form.classList.add('d-none');
+            document.getElementById('payment-processing').classList.remove('d-none');
+            
+            try {
+                // Create a payment method
+                const result = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement
+                });
+                
+                if (result.error) {
+                    throw result.error;
+                }
+                
+                // Add payment method to account
+                const response = await fetch('{{ url_for("subscription.add_payment_method") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payment_method_id: result.paymentMethod.id,
+                        set_default: setDefaultCheckbox.checked
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'An error occurred');
+                }
+                
+                // Show success message
+                document.getElementById('payment-processing').classList.add('d-none');
+                document.getElementById('payment-success').classList.remove('d-none');
+                
+                // Reload the page after 2 seconds
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                // Show error message
+                document.getElementById('payment-processing').classList.add('d-none');
+                form.classList.remove('d-none');
+                
+                document.getElementById('card-errors').textContent = error.message;
+                
+                // Re-enable the submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Add Payment Method';
+            }
+        });
+    });
+</script>
+{% endblock %}

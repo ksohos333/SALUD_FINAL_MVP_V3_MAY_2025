@@ -4,9 +4,17 @@ import datetime
 import openai
 from ai_integration.API_Integration import generate_lesson
 
-# Ensure the exercises directory exists
+# Use in-memory storage for Vercel deployment
+# Check if running on Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+# In-memory storage for exercises when on Vercel
+EXERCISES_MEMORY = {}
+
+# Local directory for exercises when running locally
 EXERCISES_DIR = os.path.join(os.path.dirname(__file__), 'generated')
-os.makedirs(EXERCISES_DIR, exist_ok=True)
+if not IS_VERCEL:
+    os.makedirs(EXERCISES_DIR, exist_ok=True)
 
 def generate_writing_exercise(language='Spanish', level='beginner', topic=None):
     """
@@ -57,12 +65,16 @@ def generate_writing_exercise(language='Spanish', level='beginner', topic=None):
             'timestamp': datetime.datetime.now().isoformat()
         }
         
-        # Save the exercise to a file
-        filename = f"{exercise_id}.json"
-        filepath = os.path.join(EXERCISES_DIR, filename)
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(exercise, f, ensure_ascii=False, indent=2)
+        if IS_VERCEL:
+            # Store in memory when on Vercel
+            EXERCISES_MEMORY[exercise_id] = exercise
+        else:
+            # Save the exercise to a file when running locally
+            filename = f"{exercise_id}.json"
+            filepath = os.path.join(EXERCISES_DIR, filename)
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(exercise, f, ensure_ascii=False, indent=2)
         
         return exercise
     
@@ -88,11 +100,18 @@ def check_writing(content, language='Spanish', exercise_id=None):
     # Get the exercise if an ID is provided
     exercise_content = ""
     if exercise_id:
-        filepath = os.path.join(EXERCISES_DIR, f"{exercise_id}.json")
-        if os.path.exists(filepath):
-            with open(filepath, 'r', encoding='utf-8') as f:
-                exercise = json.load(f)
+        if IS_VERCEL:
+            # Get from memory when on Vercel
+            if exercise_id in EXERCISES_MEMORY:
+                exercise = EXERCISES_MEMORY[exercise_id]
                 exercise_content = f"\nThis is in response to the following exercise:\n{exercise['content']}"
+        else:
+            # Get from file when running locally
+            filepath = os.path.join(EXERCISES_DIR, f"{exercise_id}.json")
+            if os.path.exists(filepath):
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    exercise = json.load(f)
+                    exercise_content = f"\nThis is in response to the following exercise:\n{exercise['content']}"
     
     # Create the prompt for the AI
     prompt = f"""
